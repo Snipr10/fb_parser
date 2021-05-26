@@ -118,3 +118,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# CELERY STUFF
+# BROKER_URL = 'pyamqp://rabbitmq:5672'
+# DOCKER
+# BROKER_URL = 'redis://redis:6378'
+BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
