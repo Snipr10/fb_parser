@@ -14,8 +14,8 @@ def get_session():
     # todo is bots?
     # return None, None, None, None
     # proxy
-    email = "79309732752"
-    password = "afOBEpOBEk74843"
+    email = "79663803199"
+    password = "xEQpdFKGtFKGo26198"
     session = requests.session()
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:39.0) Gecko/20100101 Firefox/39.0'

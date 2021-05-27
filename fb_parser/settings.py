@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core'
+
 ]
 
 MIDDLEWARE = [
@@ -123,7 +125,7 @@ STATIC_URL = '/static/'
 # BROKER_URL = 'pyamqp://rabbitmq:5672'
 # DOCKER
 # BROKER_URL = 'redis://redis:6378'
-BROKER_URL = 'redis://127.0.0.1:6379'
+BROKER_URL = 'redis://127.0.0.1:6379/1'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

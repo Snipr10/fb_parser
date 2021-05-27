@@ -5,28 +5,29 @@ import pytz
 
 class Post(models.Model):
     id = models.IntegerField(primary_key=True)
-    user_id = models.IntegerField()
+    user_id = models.IntegerField(null=True, blank=True)
     group_id = models.IntegerField()
     found_date = models.DateTimeField(auto_now=True)
-    repost_from = models.IntegerField()
-    created_date = models.DateTimeField()
+    repost_from = models.IntegerField(null=True, blank=True)
+    created_date = models.DateTimeField(null=True, blank=True)
     likes_count = models.IntegerField(default=0)
     comments_count = models.IntegerField(default=0)
     repost_count = models.IntegerField(default=0)
     trust = models.IntegerField(null=True, blank=True)
     sphinx_id = models.IntegerField(default=0)
-    updated = models.DateTimeField()
+    updated = models.DateTimeField(null=True, blank=True)
     last_modified = models.DateTimeField(default=datetime(1, 1, 1, 0, 0, tzinfo=pytz.UTC))
     content_hash = models.CharField(max_length=32, null=True, blank=True)
     # add
     taken = models.BooleanField(default=False)
+
     class Meta:
         db_table = 'prsr_parser_fb_posts'
 
 
 class PostContent(models.Model):
     post_id = models.IntegerField(primary_key=True)
-    content = models.TextField()
+    content = models.TextField(null=True, blank=True)
 
     class Meta:
         db_table = 'prsr_parser_fb_posts_content'

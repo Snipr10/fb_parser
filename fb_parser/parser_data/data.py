@@ -15,6 +15,7 @@ def get_class_text(soup, class_name):
 
 
 def get_data(url):
+    # user Proxy
     imgs = []
     owner_id = None
 
@@ -109,36 +110,48 @@ def get_data(url):
     return text, date, watch, like, share, comment, group_name, group_url, imgs, owner_id
 
 
-def search(session, fb_dtsg_ag, user, xs, token, q, cursor=None, urls=[], result=[]):
-    url = 'https://m.facebook.com/search/posts/?q=%s&source=filter&pn=8&isTrending=0&' \
-          'fb_dtsg_ag=%s&__a=AYlcAmMg3mcscBWQCbVswKQbSUum-R7WYoZMoRSwBlJp6gjuv2v2LwCzB_1ZZe4khj4N2vM7UjQWttgYqsq7DxeUlgmEVmSge5LOz1ZdWHEGQQ' % (
-          q, token)
-    if cursor:
-        url = url + "&cursor=" + cursor
-    headers = {'cookie': 'c_user=' + user + '; xs=' + xs + ';'}
+def search(session, fb_dtsg_ag, user, xs, token, q, cursor=None, urls=[], result=[], limit=0):
+    try:
+        url = 'https://m.facebook.com/search/posts/?q=%s&source=filter&pn=8&isTrending=0&' \
+              'fb_dtsg_ag=%s&__a=AYlcAmMg3mcscBWQCbVswKQbSUum-R7WYoZMoRSwBlJp6gjuv2v2LwCzB_1ZZe4khj4N2vM7UjQWttgYqsq7DxeUlgmEVmSge5LOz1ZdWHEGQQ' % (
+              q, token)
+        if cursor:
+            url = url + "&cursor=" + cursor
+        headers = {'cookie': 'c_user=' + user + '; xs=' + xs + ';'}
 
-    res = requests.get(url, headers=headers)
-    res_json = json.loads(res.text.replace("for (;;);", ''))
-    last_story_fbid = None
-    id = None
-    for story in re.findall(r'story_fbid=\d+&amp;id=\d+', res_json['payload']['actions'][0]['html']):
-        data_url = story.split('&amp;')
-        if last_story_fbid != data_url[0] or id != data_url[1]:
+        res = requests.get(url, headers=headers)
+        res_json = json.loads(res.text.replace("for (;;);", ''))
+        last_story_fbid = None
+        id = None
+        for story in re.findall(r'story_fbid=\d+&amp;id=\d+', res_json['payload']['actions'][0]['html']):
+            data_url = story.split('&amp;')
+            if last_story_fbid != data_url[0] or id != data_url[1]:
+                if story not in urls:
+                    last_story_fbid = data_url[0]
+                    id = data_url[1]
+                    result.append(data_url[0].replace('story_fbid=', '')+'&'+ data_url[1].replace('id=', ''))
+        for story in re.findall(r'groups/\d+/permalink/\d+', res_json['payload']['actions'][0]['html']):
+            data_url = story.split('/permalink/')
+            if last_story_fbid != data_url[0] or id != data_url[1]:
+                if story not in urls:
+                    last_story_fbid = data_url[0].replace('groups/', '')
+                    id = data_url[1]
+                    urls.append(story)
+                    result.append(data_url[1] + '&' + data_url[0].replace('groups/', ''))
 
-            story = 'https://m.facebook.com/story.php?%s&%s' % (data_url[0], data_url[1])
-            if story not in urls:
-                print(story)
-                result.append(story)
-                last_story_fbid = data_url[0]
-                id = data_url[1]
-                urls.append(story)
-    cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
-    search(session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result)
+        cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
+        if limit <= 10:
+            search(session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result, limit+1)
+    except Exception as e:
+        print(e)
+        pass
     return result
 
 
-def get_data_from_url(url):
-    text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data(url)
+def get_data_from_url(post):
+    url = 'https://m.facebook.com/story.php?story_fbid=%s&id=%s' % (post.id, post.group_id)
+
+    return get_data(url)
 
     # text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data(story)
     # if text is not None:
