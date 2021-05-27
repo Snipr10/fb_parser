@@ -7,7 +7,7 @@ class Post(models.Model):
     id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField()
     group_id = models.IntegerField()
-    found_date = models.DateTimeField()
+    found_date = models.DateTimeField(auto_now=True)
     repost_from = models.IntegerField()
     created_date = models.DateTimeField()
     likes_count = models.IntegerField(default=0)
@@ -18,7 +18,8 @@ class Post(models.Model):
     updated = models.DateTimeField()
     last_modified = models.DateTimeField(default=datetime(1, 1, 1, 0, 0, tzinfo=pytz.UTC))
     content_hash = models.CharField(max_length=32, null=True, blank=True)
-
+    # add
+    taken = models.BooleanField(default=False)
     class Meta:
         db_table = 'prsr_parser_fb_posts'
 

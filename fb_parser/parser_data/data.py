@@ -119,9 +119,6 @@ def search(session, fb_dtsg_ag, user, xs, token, q, cursor=None, urls=[], result
 
     res = requests.get(url, headers=headers)
     res_json = json.loads(res.text.replace("for (;;);", ''))
-    # story_url = find_value(res_json['payload']['actions'][0]['html'], "/story.php?", num_sep_chars=0, separator='&amp;__tn__=%2AW')
-    # data_url = story_url.split('&amp;')
-    # story = 'https://m.facebook.com/story.php?%s&%s' %(data_url[0], data_url[1])
     last_story_fbid = None
     id = None
     for story in re.findall(r'story_fbid=\d+&amp;id=\d+', res_json['payload']['actions'][0]['html']):
@@ -131,26 +128,32 @@ def search(session, fb_dtsg_ag, user, xs, token, q, cursor=None, urls=[], result
             story = 'https://m.facebook.com/story.php?%s&%s' % (data_url[0], data_url[1])
             if story not in urls:
                 print(story)
-                text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data(story)
-                if text is not None:
-                    result.append({
-                        'id': data_url[1],
-                        'story': story,
-                        'text': text,
-                        'date': date,
-                        'watch': watch,
-                        'like': like,
-                        'share': share,
-                        'comment': comment,
-                        'group_name': owner_name,
-                        'group_url': owner_url,
-                        'group_id': data_url[0],
-                        'owner_id': owner_id,
-                        'photo': imgs
-                    })
+                result.append(story)
                 last_story_fbid = data_url[0]
                 id = data_url[1]
                 urls.append(story)
     cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
     search(session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result)
     return result
+
+
+def get_data_from_url(url):
+    text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data(url)
+
+    # text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data(story)
+    # if text is not None:
+    #     result.append({
+    #         'id': data_url[1],
+    #         'story': story,
+    #         'text': text,
+    #         'date': date,
+    #         'watch': watch,
+    #         'like': like,
+    #         'share': share,
+    #         'comment': comment,
+    #         'group_name': owner_name,
+    #         'group_url': owner_url,
+    #         'group_id': data_url[0],
+    #         'owner_id': owner_id,
+    #         'photo': imgs
+    #     })

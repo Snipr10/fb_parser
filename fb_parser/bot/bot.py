@@ -23,10 +23,10 @@ def get_session():
 
     fb_dtsg, user_id, xs, token = login(session, email, password)
     if fb_dtsg:
-        return fb_dtsg, user_id, xs, token
+        return session, fb_dtsg, user_id, xs, token
     else:
         # return get_session()
-        return None, None, None, None
+        return None, None, None, None, None
 
 
 def login(session, email, password):
