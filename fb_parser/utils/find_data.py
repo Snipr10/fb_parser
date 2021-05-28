@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 
 
@@ -22,3 +23,7 @@ def get_md5_text(text):
     m = hashlib.md5()
     m.update(text.encode())
     return str(m.hexdigest())
+
+
+def update_time_timezone(my_time):
+    return my_time + datetime.timedelta(hours=3)

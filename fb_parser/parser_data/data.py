@@ -3,8 +3,9 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
+from django.utils import timezone
 
-from fb_parser.utils.find_data import find_value
+from fb_parser.utils.find_data import find_value, update_time_timezone
 
 
 def get_class_text(soup, class_name):
@@ -110,11 +111,12 @@ def get_data(url):
     return text, date, watch, like, share, comment, group_name, group_url, imgs, owner_id
 
 
-def search(session, fb_dtsg_ag, user, xs, token, q, cursor=None, urls=[], result=[], limit=0):
+def search(session, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[], limit=0):
     try:
+        q = key_word.keyword
         url = 'https://m.facebook.com/search/posts/?q=%s&source=filter&pn=8&isTrending=0&' \
               'fb_dtsg_ag=%s&__a=AYlcAmMg3mcscBWQCbVswKQbSUum-R7WYoZMoRSwBlJp6gjuv2v2LwCzB_1ZZe4khj4N2vM7UjQWttgYqsq7DxeUlgmEVmSge5LOz1ZdWHEGQQ' % (
-              q, token)
+              key_word.k, token)
         if cursor:
             url = url + "&cursor=" + cursor
         headers = {'cookie': 'c_user=' + user + '; xs=' + xs + ';'}
@@ -141,10 +143,16 @@ def search(session, fb_dtsg_ag, user, xs, token, q, cursor=None, urls=[], result
 
         cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
         if limit <= 10:
-            search(session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result, limit+1)
+            try:
+                search(session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result, limit+1)
+            except Exception as e:
+                print(e)
+        key_word.last_modified = update_time_timezone(timezone.localtime())
     except Exception as e:
         print(e)
         pass
+    key_word.taken = 0
+    key_word.save()
     return result
 
 
