@@ -211,8 +211,50 @@ class KeywordSource(models.Model):
         db_table = 'prsr_parser_source_keywords'
 
 
+class Account(models.Model):
+    login = models.CharField(default='', max_length=200)
+    password = models.CharField(default='', max_length=200)
+    available = models.BooleanField(default=True)
+    availability_check = models.DateTimeField(null=True, blank=True)
+    banned = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'prsr_parser_fb_account'
 
 
+class AllProxy(models.Model):
+    ip = models.CharField(max_length=256)
+    port = models.IntegerField()
+    login = models.CharField(max_length=256)
+    proxy_password = models.CharField(max_length=256)
+    lastа_used = models.DateTimeField(null=True, blank=True)
+    last_used_y = models.DateTimeField(null=True, blank=True)
+    failed = models.IntegerField()
+    errors = models.IntegerField()
+    foregin = models.IntegerField()
+    banned_fb = models.IntegerField()
+    banned_y = models.IntegerField()
+    banned_tw = models.IntegerField()
+    valid_untill = models.DateTimeField(null=True, blank=True)
+    timezone = models.CharField(max_length=256)
+    v6 = models.IntegerField()
+    last_modified = models.DateTimeField(null=True, blank=True)
+    checking = models.BooleanField()
+
+    class Meta:
+        db_table = 'prsr_parser_proxy'
+
+
+class WorkCred(models.Model):
+    account_id = models.IntegerField()
+    proxy_id = models.IntegerField()
+    in_progress = models.BooleanField(default=False)
+    start_parsing = models.DateTimeField(null=True, blank=True)
+    last_parsing = models.DateTimeField(null=True, blank=True)
+    locked = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'prsr_parser_fb_worker_cerd'
 
 
 

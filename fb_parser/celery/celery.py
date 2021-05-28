@@ -15,8 +15,12 @@ app.config_from_object('django.conf:settings')
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'start_search_posts': {
-        'task': 'fb_parser.tasks.start_search_posts',
+    'start_first_update_posts': {
+        'task': 'fb_parser.tasks.start_first_update_posts',
+        'schedule': crontab(minute='*/5')
+    },
+    'start_parsing_by_keyword': {
+        'task': 'fb_parser.tasks.start_parsing_by_keyword',
         'schedule': crontab(minute='*/5')
     },
 }

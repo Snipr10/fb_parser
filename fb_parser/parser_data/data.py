@@ -1,3 +1,6 @@
+import datetime
+import dateutil.parser
+
 import json
 import re
 
@@ -5,7 +8,8 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils import timezone
 
-from fb_parser.utils.find_data import find_value, update_time_timezone
+from core import models
+from fb_parser.utils.find_data import find_value, update_time_timezone, get_sphinx_id, get_md5_text
 
 
 def get_class_text(soup, class_name):
@@ -111,7 +115,7 @@ def get_data(url):
     return text, date, watch, like, share, comment, group_name, group_url, imgs, owner_id
 
 
-def search(session, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[], limit=0):
+def search(work_credit, session, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[], limit=0):
     try:
         q = key_word.keyword
         url = 'https://m.facebook.com/search/posts/?q=%s&source=filter&pn=8&isTrending=0&' \
@@ -144,7 +148,7 @@ def search(session, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[],
         cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
         if limit <= 10:
             try:
-                search(session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result, limit+1)
+                search(work_credit, session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result, limit+1)
             except Exception as e:
                 print(e)
         key_word.last_modified = update_time_timezone(timezone.localtime())
@@ -153,28 +157,41 @@ def search(session, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[],
         pass
     key_word.taken = 0
     key_word.save()
+    work_credit.last_parsing = datetime.datetime.now()
+    work_credit.in_progress = False
+    work_credit.save()
     return result
 
 
 def get_data_from_url(post):
     url = 'https://m.facebook.com/story.php?story_fbid=%s&id=%s' % (post.id, post.group_id)
-
     return get_data(url)
 
-    # text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data(story)
-    # if text is not None:
-    #     result.append({
-    #         'id': data_url[1],
-    #         'story': story,
-    #         'text': text,
-    #         'date': date,
-    #         'watch': watch,
-    #         'like': like,
-    #         'share': share,
-    #         'comment': comment,
-    #         'group_name': owner_name,
-    #         'group_url': owner_url,
-    #         'group_id': data_url[0],
-    #         'owner_id': owner_id,
-    #         'photo': imgs
-    #     })
+
+def parallel_parse_post(post):
+    try:
+        post.taken = 1
+        post.save()
+        try:
+            text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data_from_url(post)
+            if text is not None:
+                if owner_id is None:
+                    post.user_id = post.group_id
+                else:
+                    post.user_id = owner_id
+                post.created_date = dateutil.parser.parse(date)
+                post.likes_count = like
+                post.comments_count = comment
+                post.repost_count = share
+                post.last_modified = datetime.datetime.now()
+                post.sphinx_id = get_sphinx_id(post.id, post.group_id)
+                post.content_hash = get_md5_text(text)
+                post.taken = 0
+                post.save()
+                models.PostContent.objects.create(post_id=post.id, content=text)
+        except Exception:
+            post.taken = 0
+            post.save()
+    except Exception:
+        post.taken = 0
+        post.save()

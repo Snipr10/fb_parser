@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import json
 import re
 import time
@@ -7,6 +8,7 @@ import requests
 import pyquery
 from bs4 import BeautifulSoup
 
+from core import models
 from fb_parser.utils.find_data import find_value
 
 
@@ -14,19 +16,36 @@ def get_session():
     # todo is bots?
     # return None, None, None, None
     # proxy
-    email = "79663803199"
-    password = "xEQpdFKGtFKGo26198"
+    work_credit = models.WorkCred.objects.filter(in_progress=False, locked=False).order_by('last_parsing').first()
+    if work_credit is None:
+        return None, None, None, None, None, None
+    # email = "79663803199"
+    # password = "xEQpdFKGtFKGo26198"
+    work_credit.in_progress = True
+    work_credit.save()
+    try:
+        account = models.Account.objects.get(id=work_credit.account_id)
+    except Exception:
+        work_credit.locked = True
+        work_credit.save()
+        return get_session()
+    try:
+        proxy = models.AllProxy.objects.get(id=work_credit.proxy_id)
+    except Exception:
+        work_credit.delete()
+        return get_session()
     session = requests.session()
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:39.0) Gecko/20100101 Firefox/39.0'
     })
 
-    fb_dtsg, user_id, xs, token = login(session, email, password)
+    fb_dtsg, user_id, xs, token = login(session, account.login, account.password)
     if fb_dtsg:
-        return session, fb_dtsg, user_id, xs, token
+        account.availability_check = datetime.datetime.now()
+        account.save()
+        return work_credit, session, fb_dtsg, user_id, xs, token
     else:
-        # return get_session()
-        return None, None, None, None, None
+        return get_session()
 
 
 def login(session, email, password):
