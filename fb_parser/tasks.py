@@ -33,12 +33,12 @@ def start_parsing_by_keyword():
                     time = 0
                 if last_update is None or (last_update + datetime.timedelta(minutes=time) <
                                            update_time_timezone(timezone.localtime())):
-                    work_credit, session, fb_dtsg, user_id, xs, token = get_session()
+                    work_credit, proxy, session, fb_dtsg, user_id, xs, token = get_session()
                     print("1")
                     if fb_dtsg is not None:
                         key_word.taken = 1
                         key_word.save()
-                        pool_source.submit(search, work_credit, session, fb_dtsg, user_id, xs, token, key_word.keyword)
+                        pool_source.submit(search, work_credit, proxy, session, fb_dtsg, user_id, xs, token, key_word.keyword)
         except Exception as e:
             print(e)
             try:

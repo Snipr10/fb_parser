@@ -1,15 +1,10 @@
-import argparse
 import datetime
-import json
-import re
-import time
-
 import requests
 import pyquery
-from bs4 import BeautifulSoup
 
 from core import models
 from fb_parser.utils.find_data import find_value
+from fb_parser.utils.proxy import get_proxy_str, proxy_last_used
 
 
 def get_session():
@@ -18,7 +13,7 @@ def get_session():
     # proxy
     work_credit = models.WorkCred.objects.filter(in_progress=False, locked=False).order_by('last_parsing').first()
     if work_credit is None:
-        return None, None, None, None, None, None
+        return None, None, None, None, None, None, None
     # email = "79663803199"
     # password = "xEQpdFKGtFKGo26198"
     work_credit.in_progress = True
@@ -35,6 +30,7 @@ def get_session():
         work_credit.delete()
         return get_session()
     session = requests.session()
+    session.proxies.update(get_proxy_str(proxy))
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:39.0) Gecko/20100101 Firefox/39.0'
     })
@@ -43,8 +39,10 @@ def get_session():
     if fb_dtsg:
         account.availability_check = datetime.datetime.now()
         account.save()
-        return work_credit, session, fb_dtsg, user_id, xs, token
+        proxy_last_used(proxy)
+        return work_credit, proxy, session, fb_dtsg, user_id, xs, token
     else:
+        work_credit.delete()
         return get_session()
 
 

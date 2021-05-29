@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from core import models
 from fb_parser.utils.find_data import find_value, update_time_timezone, get_sphinx_id, get_md5_text
+from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used
 
 
 def get_class_text(soup, class_name):
@@ -19,7 +20,7 @@ def get_class_text(soup, class_name):
         return None
 
 
-def get_data(url):
+def get_data(url, proxy):
     # user Proxy
     imgs = []
     owner_id = None
@@ -28,7 +29,7 @@ def get_data(url):
         # todo time out requests
         # time.sleep(60)
         # test
-        res = requests.get(url)
+        res = requests.get(url, proxies=get_proxy_str(proxy))
         res_text = res.text
         try:
             soup = BeautifulSoup(res_text)
@@ -115,7 +116,7 @@ def get_data(url):
     return text, date, watch, like, share, comment, group_name, group_url, imgs, owner_id
 
 
-def search(work_credit, session, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[], limit=0):
+def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[], limit=0):
     try:
         q = key_word.keyword
         url = 'https://m.facebook.com/search/posts/?q=%s&source=filter&pn=8&isTrending=0&' \
@@ -148,7 +149,7 @@ def search(work_credit, session, fb_dtsg_ag, user, xs, token, key_word, cursor=N
         cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
         if limit <= 10:
             try:
-                search(work_credit, session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result, limit+1)
+                search(work_credit, proxy, session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result, limit+1)
             except Exception as e:
                 print(e)
         key_word.last_modified = update_time_timezone(timezone.localtime())
@@ -160,20 +161,26 @@ def search(work_credit, session, fb_dtsg_ag, user, xs, token, key_word, cursor=N
     work_credit.last_parsing = datetime.datetime.now()
     work_credit.in_progress = False
     work_credit.save()
+    proxy.last_used = datetime.datetime.now()
+    proxy.save()
     return result
 
 
-def get_data_from_url(post):
+def get_data_from_url(post, proxy):
     url = 'https://m.facebook.com/story.php?story_fbid=%s&id=%s' % (post.id, post.group_id)
-    return get_data(url)
+    return get_data(url, proxy)
 
 
 def parallel_parse_post(post):
+    proxy = get_proxy()
+    if proxy is None:
+        return
     try:
+        proxy_last_used(proxy)
         post.taken = 1
         post.save()
         try:
-            text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data_from_url(post)
+            text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data_from_url(post, proxy)
             if text is not None:
                 if owner_id is None:
                     post.user_id = post.group_id
@@ -195,3 +202,4 @@ def parallel_parse_post(post):
     except Exception:
         post.taken = 0
         post.save()
+    proxy_last_used(proxy)
