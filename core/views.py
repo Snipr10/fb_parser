@@ -6,8 +6,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
 from core import models
-from fb_parser.tasks import start_search_posts, start_update_posts
-
 
 @csrf_exempt
 @api_view(["GET"])

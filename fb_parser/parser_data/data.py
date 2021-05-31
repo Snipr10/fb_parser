@@ -51,9 +51,10 @@ def get_data(url, proxy):
                     pass
         except Exception:
             pass
-        text = get_class_text(soup, 'bx')
-        if text is None:
-            text = get_class_text(soup, 'bw')
+        # text = get_class_text(soup, 'bx')
+        # if text is None:
+        #     text = get_class_text(soup, 'bw')
+        text = None
         if text is None:
             try:
                 divs = soup.find_all("div")
@@ -93,19 +94,28 @@ def get_data(url, proxy):
         share = find_value(res_text, 'ShareAction"', 24, separator='}')
         comment = find_value(res_text, 'CommentAction"', 24, separator='}')
         try:
-            group = soup.find_all("h3", {'class': ['bt', 'bu', 'bv', 'bw']})[0]
-            group_name = group.text
+            owner = soup.find_all("h3", {'class': ['bt', 'bu', 'bv', 'bw']})[0]
             try:
+                owner_name = owner.contents[0].text
+            except Exception:
+                owner_name = owner.text
+            try:
+                owner = owner.find_all('a', href=True)
+                owner_url = owner[0]['href']
+                owner_url = owner_url[:owner_url.find('&')].replace("?refid=52", "")
+                owner_id = owner[1]['href']
+                owner_id = owner_id[owner_id.find('&id=') +4:].replace('&refid=18&__tn__=C-R', '')
 
-                group_url = group.find_all('a', href=True)[0]['href']
-                group_url = group_url[:group_url.find('&')].replace("?refid=52", "")
             except Exception as e:
                 print(e)
-                group_url = '/profile.php?' + url[url.find("&id=") + 1:]
+                owner_id = url[url.find("&id=") + 1:]
+
+                owner_url = '/profile.php?' + url[url.find("&id=") + 1:]
         except Exception as e:
             print(e)
-            group_name = None
-            group_url = '/profile.php?' + url[url.find("&id=") + 1:]
+            owner_name = None
+            owner_id = url[url.find("&id=") + 1:]
+            owner_url = '/profile.php?' + url[url.find("&id=") + 1:]
         try:
             owner_id = find_value(find_value(res_text, 'owning_profile', 1, separator='}'), 'id:', 1, separator='"')
         except Exception as e:
@@ -113,7 +123,7 @@ def get_data(url, proxy):
     except Exception as e:
         print(e)
         return None, None, None, None, None, None, None, None, imgs, owner_id
-    return text, date, watch, like, share, comment, group_name, group_url, imgs, owner_id
+    return text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id
 
 
 def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[], limit=0):
@@ -182,6 +192,7 @@ def parallel_parse_post(post):
         try:
             text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data_from_url(post, proxy)
             if text is not None:
+                # if owner_id is None or owner_id == post.group_id:
                 if owner_id is None:
                     post.user_id = post.group_id
                 else:
@@ -196,6 +207,7 @@ def parallel_parse_post(post):
                 post.taken = 0
                 post.save()
                 models.PostContent.objects.create(post_id=post.id, content=text)
+
         except Exception:
             post.taken = 0
             post.save()

@@ -41,8 +41,8 @@ class User(models.Model):
     url = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     sex = models.IntegerField(default=0)
-    bdate = models.DateField()
-    followers = models.IntegerField(default=0)
+    bdate = models.DateField(null=True, blank=True)
+    followers = models.IntegerField(null=True, blank=True)
     last_modify = models.DateTimeField()
 
     class Meta:
