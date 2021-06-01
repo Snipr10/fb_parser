@@ -10,9 +10,9 @@ class Post(models.Model):
     found_date = models.DateTimeField(auto_now=True)
     repost_from = models.IntegerField(null=True, blank=True)
     created_date = models.DateTimeField(null=True, blank=True)
-    likes_count = models.IntegerField(default=0)
-    comments_count = models.IntegerField(default=0)
-    repost_count = models.IntegerField(default=0)
+    likes_count = models.IntegerField(default=0, null=True, blank=True)
+    comments_count = models.IntegerField(default=0, null=True, blank=True)
+    repost_count = models.IntegerField(default=0, null=True, blank=True)
     trust = models.IntegerField(null=True, blank=True)
     sphinx_id = models.IntegerField(default=0)
     updated = models.DateTimeField(null=True, blank=True)
@@ -269,10 +269,10 @@ class Test(models.Model):
     key2 = models.IntegerField()
 
 
-class Test1(models.Model):
-    class Meta:
-        unique_together = (('key1', 'key2'),)
-        db_table = 'core_test1'
-
-    key1 = models.IntegerField()
-    key2 = models.IntegerField()
+# class Test1(models.Model):
+#     class Meta:
+#         unique_together = (('key1', 'key2'),)
+#         db_table = 'core_test1'
+#
+#     key1 = models.IntegerField()
+#     key2 = models.IntegerField()

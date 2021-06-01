@@ -1,11 +1,18 @@
 import datetime
 
+from django.db.models import Q
+from django.utils import timezone
+
 from core import models
 
 
 def get_proxy():
     # proxy = models.AllProxy.objects.filter(failed=False)
-    proxy = models.AllProxy.objects.filter().order_by('last_modified').first()
+    proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
+                                           | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4)
+                                               ),
+                                           ).order_by('last_used').first()
+
     return proxy
 
 

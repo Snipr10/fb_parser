@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from django.utils import timezone
 
 from core import models
+from fb_parser.settings import BATCH_SIZE
 from fb_parser.utils.find_data import find_value, update_time_timezone, get_sphinx_id, get_md5_text
 from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used
 
@@ -90,9 +91,17 @@ def get_data(url, proxy):
             except Exception:
                 pass
         watch = find_value(res_text, 'WatchAction"', 24, separator='}')
+        if watch is not None:
+            watch.replace(":", '')
         like = find_value(res_text, 'LikeAction"', 24, separator='}')
+        if like is not None:
+            like.replace(":", '')
         share = find_value(res_text, 'ShareAction"', 24, separator='}')
+        if share is not None:
+            share.replace(":", '')
         comment = find_value(res_text, 'CommentAction"', 24, separator='}')
+        if comment is not None:
+            comment.replace(":", '')
         try:
             owner = soup.find_all("h3", {'class': ['bt', 'bu', 'bv', 'bw']})[0]
             try:
@@ -103,12 +112,12 @@ def get_data(url, proxy):
                 owner = owner.find_all('a', href=True)
                 owner_url = owner[0]['href']
                 owner_url = owner_url[:owner_url.find('&')].replace("?refid=52", "")
-                owner_id = owner[1]['href']
-                owner_id = owner_id[owner_id.find('&id=') +4:].replace('&refid=18&__tn__=C-R', '')
+                owner_id_all = owner[1]['href']
+                owner_id = owner_id_all[owner_id_all.find('&id=') + 4:].replace('&refid=18&__tn__=C-R', '')
 
             except Exception as e:
                 print(e)
-                owner_id = url[url.find("&id=") + 1:]
+                owner_id = url[url.find("&id=") + 4:]
 
                 owner_url = '/profile.php?' + url[url.find("&id=") + 1:]
         except Exception as e:
@@ -117,7 +126,8 @@ def get_data(url, proxy):
             owner_id = url[url.find("&id=") + 1:]
             owner_url = '/profile.php?' + url[url.find("&id=") + 1:]
         try:
-            owner_id = find_value(find_value(res_text, 'owning_profile', 1, separator='}'), 'id:', 1, separator='"')
+            if owner_id is None:
+                owner_id = find_value(find_value(res_text, 'owning_profile', 1, separator='}'), 'id:', 1, separator='"')
         except Exception as e:
             print(e)
     except Exception as e:
@@ -126,12 +136,13 @@ def get_data(url, proxy):
     return text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id
 
 
-def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[], limit=0):
+def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[],
+                   limit=0):
     try:
         q = key_word.keyword
         url = 'https://m.facebook.com/search/posts/?q=%s&source=filter&pn=8&isTrending=0&' \
               'fb_dtsg_ag=%s&__a=AYlcAmMg3mcscBWQCbVswKQbSUum-R7WYoZMoRSwBlJp6gjuv2v2LwCzB_1ZZe4khj4N2vM7UjQWttgYqsq7DxeUlgmEVmSge5LOz1ZdWHEGQQ' % (
-              key_word.k, token)
+                  q, token)
         if cursor:
             url = url + "&cursor=" + cursor
         headers = {'cookie': 'c_user=' + user + '; xs=' + xs + ';'}
@@ -146,7 +157,7 @@ def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, c
                 if story not in urls:
                     last_story_fbid = data_url[0]
                     id = data_url[1]
-                    result.append(data_url[0].replace('story_fbid=', '')+'&'+ data_url[1].replace('id=', ''))
+                    result.append(data_url[0].replace('story_fbid=', '') + '&' + data_url[1].replace('id=', ''))
         for story in re.findall(r'groups/\d+/permalink/\d+', res_json['payload']['actions'][0]['html']):
             data_url = story.split('/permalink/')
             if last_story_fbid != data_url[0] or id != data_url[1]:
@@ -159,13 +170,32 @@ def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, c
         cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
         if limit <= 10:
             try:
-                search(work_credit, proxy, session, fb_dtsg_ag, user, xs, token, q, cursor, urls, result, limit+1)
+                search_by_word(work_credit, proxy, session, fb_dtsg_ag, user, xs, token, key_word, cursor, urls, result,
+                               limit + 1)
             except Exception as e:
                 print(e)
         key_word.last_modified = update_time_timezone(timezone.localtime())
     except Exception as e:
         print(e)
         pass
+    return result
+
+
+def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[],
+           limit=0):
+    result = search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[],
+                            result=[], limit=0)
+    posts = []
+
+    for res in result:
+        data_url = res.split('&')
+        try:
+
+            posts.append(models.Post(id=int(data_url[0]),
+                                     group_id=int(data_url[1])))
+        except Exception as e:
+            print(e)
+    models.Post.objects.bulk_create(posts, batch_size=BATCH_SIZE, ignore_conflicts=True)
     key_word.taken = 0
     key_word.save()
     work_credit.last_parsing = datetime.datetime.now()
@@ -190,14 +220,18 @@ def parallel_parse_post(post):
         post.taken = 1
         post.save()
         try:
-            text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data_from_url(post, proxy)
+            text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data_from_url(post,
+                                                                                                               proxy)
             if text is not None:
                 # if owner_id is None or owner_id == post.group_id:
                 if owner_id is None:
                     post.user_id = post.group_id
                 else:
                     post.user_id = owner_id
-                post.created_date = dateutil.parser.parse(date)
+                try:
+                    post.created_date = dateutil.parser.parse(date)
+                except TypeError:
+                    pass
                 post.likes_count = like
                 post.comments_count = comment
                 post.repost_count = share
@@ -208,10 +242,10 @@ def parallel_parse_post(post):
                 post.save()
                 models.PostContent.objects.create(post_id=post.id, content=text)
 
-        except Exception:
-            post.taken = 0
-            post.save()
-    except Exception:
-        post.taken = 0
-        post.save()
+        except Exception as e:
+            pass
+    except Exception as e:
+        pass
+    post.taken = 0
+    post.save()
     proxy_last_used(proxy)

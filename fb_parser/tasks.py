@@ -18,11 +18,13 @@ def start_parsing_by_keyword():
     select_sources = models.Sources.objects.filter(
         Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
         status=1)
+    select_sources = models.Sources.objects.filter()
     key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
 
     key_words = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
                                               id__in=list(key_source.values_list('keyword_id', flat=True))
                                               ).order_by('last_modified')
+    key_words = models.Keyword.objects.filter()
     for key_word in key_words:
         try:
             if key_word is not None:
@@ -38,7 +40,7 @@ def start_parsing_by_keyword():
                     if fb_dtsg is not None:
                         key_word.taken = 1
                         key_word.save()
-                        pool_source.submit(search, work_credit, proxy, session, fb_dtsg, user_id, xs, token, key_word.keyword)
+                        pool_source.submit(search, work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
         except Exception as e:
             print(e)
             try:
@@ -80,7 +82,7 @@ def start_parsing_by_keyword():
 def start_first_update_posts():
     pool_source = ThreadPoolExecutor(15)
     posts = models.Post.objects.filter(last_modified__lte=datetime.date(2000, 1, 1),
-                                       taken=0).order_by('found_date')
+                                       taken=0).order_by('found_date')[:100]
 
     for post in posts:
         try:

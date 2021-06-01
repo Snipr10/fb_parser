@@ -47,24 +47,28 @@ def get_session():
 
 
 def login(session, email, password):
-    # load Facebook's cookies.
-    response = session.get('https://m.facebook.com')
+    try:
+        # load Facebook's cookies.
+        response = session.get('https://m.facebook.com')
 
-    # login to Facebook
-    response = session.post('https://m.facebook.com/login.php', data={
-        'email': email,
-        'pass': password
-    }, allow_redirects=False)
+        # login to Facebook
+        response = session.post('https://m.facebook.com/login.php', data={
+            'email': email,
+            'pass': password
+        }, allow_redirects=False)
 
-    # If c_user cookie is present, login was successful
-    if 'c_user' in response.cookies:
+        # If c_user cookie is present, login was successful
+        if 'c_user' in response.cookies:
 
-        # Make a request to homepage to get fb_dtsg token
-        homepage_resp = session.get('https://m.facebook.com/home.php')
+            # Make a request to homepage to get fb_dtsg token
+            homepage_resp = session.get('https://m.facebook.com/home.php')
 
-        dom = pyquery.PyQuery(homepage_resp.text.encode('utf8'))
-        fb_dtsg = dom('input[name="fb_dtsg"]').val()
-        token = find_value(homepage_resp.text, 'dtsg_ag":{"token":')
-        return fb_dtsg, response.cookies['c_user'], response.cookies['xs'], token
-    else:
+            dom = pyquery.PyQuery(homepage_resp.text.encode('utf8'))
+            fb_dtsg = dom('input[name="fb_dtsg"]').val()
+            token = find_value(homepage_resp.text, 'dtsg_ag":{"token":')
+            return fb_dtsg, response.cookies['c_user'], response.cookies['xs'], token
+        else:
+            return False, None, None, None
+    except Exception:
         return False, None, None, None
+
