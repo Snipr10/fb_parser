@@ -12,7 +12,8 @@ def get_proxy():
                                            | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4)
                                                ),
                                            ).order_by('last_used').first()
-
+    if proxy is not None:
+        proxy_last_used(proxy)
     return proxy
 
 

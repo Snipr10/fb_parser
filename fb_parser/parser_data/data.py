@@ -216,7 +216,6 @@ def parallel_parse_post(post):
     if proxy is None:
         return
     try:
-        proxy_last_used(proxy)
         post.taken = 1
         post.save()
         try:
@@ -224,6 +223,9 @@ def parallel_parse_post(post):
                                                                                                                proxy)
             if text is not None:
                 # if owner_id is None or owner_id == post.group_id:
+
+                # get_user_data(url, attempt + 1)
+
                 if owner_id is None:
                     post.user_id = post.group_id
                 else:
