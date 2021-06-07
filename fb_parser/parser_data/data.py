@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from django.utils import timezone
 
 from core import models
+from fb_parser.parser_data.user import get_update_user
 from fb_parser.settings import BATCH_SIZE
 from fb_parser.utils.find_data import find_value, update_time_timezone, get_sphinx_id, get_md5_text
 from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used
@@ -243,6 +244,8 @@ def parallel_parse_post(post):
                 post.taken = 0
                 post.save()
                 models.PostContent.objects.create(post_id=post.id, content=text)
+                get_update_user(post.user_id)
+                get_update_user(owner_id)
 
         except Exception as e:
             pass

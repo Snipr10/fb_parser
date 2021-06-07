@@ -7,13 +7,14 @@ from fb_parser.utils.proxy import get_proxy, get_proxy_str
 
 
 def get_update_user(user_id):
-    user = models.User.objects.filter(id=user_id)
-    if user.exists():
-        return
-    else:
-        username, fb_id, href = get_user_data('https://www.facebook.com/profile.php?id=' + user_id)
-        if username is not None or fb_id is not None or href is not None:
-            models.User.objects.create(id=user_id, screen_name=username, url=href, sphinx_id=get_sphinx_id(href))
+    if user_id is not None:
+        user = models.User.objects.filter(id=user_id)
+        if user.exists():
+            return
+        else:
+            username, fb_id, href = get_user_data('https://www.facebook.com/profile.php?id=' + user_id)
+            if username is not None or fb_id is not None or href is not None:
+                models.User.objects.create(id=user_id, screen_name=username, url=href, sphinx_id=get_sphinx_id(href))
 
 
 def get_user_data(url, attempt=0):
