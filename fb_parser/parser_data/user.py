@@ -12,17 +12,18 @@ def get_update_user(user_id):
         if user.exists():
             return
         else:
-            username, fb_id, href = get_user_data('https://www.facebook.com/profile.php?id=' + user_id)
+            username, fb_id, href, logo = get_user_data('https://www.facebook.com/profile.php?id=' + user_id)
             if username is not None or fb_id is not None or href is not None:
-                models.User.objects.create(id=user_id, screen_name=username, url=href, sphinx_id=get_sphinx_id(href))
+                models.User.objects.create(id=user_id, screen_name=username, url=href, sphinx_id=get_sphinx_id(href),
+                                           logo=logo)
 
 
 def get_user_data(url, attempt=0):
     if attempt >= 5:
-        return None
+        return None, None, None, None
     proxy = get_proxy()
     if proxy is None:
-        return None, None, None
+        return None, None, None, None
     try:
          # get proxy
         # r = requests.get(url,  proxies=get_proxy_str(proxy)).text
@@ -38,7 +39,12 @@ def get_user_data(url, attempt=0):
                     pass
             else:
                 fb_id = find_value(res.text, 'userID', 3, separator='"')
-            return s.find("title").text, fb_id, href
+            avatar = None
+            try:
+                avatar = s.find_all('meta', property="og:image")[0]['content']
+            except Exception:
+                pass
+            return s.find("title").text, fb_id, href, avatar
         else:
             return get_user_data(url, attempt+1)
     except Exception:
