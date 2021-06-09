@@ -86,7 +86,7 @@ def start_parsing_by_keyword():
 #     # stop session
 #     # TASK OK OR NOT!
 
-
+@app.task
 def start_first_update_posts():
     pool_source = ThreadPoolExecutor(15)
     posts = models.Post.objects.filter(last_modified__lte=datetime.date(2000, 1, 1),
