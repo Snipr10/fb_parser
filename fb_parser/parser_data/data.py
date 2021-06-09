@@ -7,12 +7,14 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from django.utils import timezone
+from requests.exceptions import SSLError, ConnectTimeout, ProxyError
+from urllib3 import HTTPSConnectionPool
 
 from core import models
 from fb_parser.parser_data.user import get_update_user
 from fb_parser.settings import BATCH_SIZE
 from fb_parser.utils.find_data import find_value, update_time_timezone, get_sphinx_id, get_md5_text
-from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used
+from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used, stop_proxy
 
 
 def get_class_text(soup, class_name):
@@ -31,7 +33,8 @@ def get_data(url, proxy):
         # todo time out requests
         # time.sleep(60)
         # test
-        res = requests.get(url, proxies=get_proxy_str(proxy))
+        res = requests.get(url, proxies=get_proxy_str(proxy), timeout=60)
+
         res_text = res.text
         try:
             soup = BeautifulSoup(res_text)
@@ -131,6 +134,15 @@ def get_data(url, proxy):
                 owner_id = find_value(find_value(res_text, 'owning_profile', 1, separator='}'), 'id:', 1, separator='"')
         except Exception as e:
             print(e)
+    except (SSLError, ConnectionError, ConnectTimeout):
+        stop_proxy(proxy)
+        return get_data(url, get_proxy())
+    except ProxyError:
+        stop_proxy(proxy)
+        return get_data(url, get_proxy())
+    # except HTTPSConnectionPool:
+    #     stop_proxy(proxy)
+    #     return get_data(url, get_proxy())
     except Exception as e:
         print(e)
         return None, None, None, None, None, None, None, None, imgs, owner_id
@@ -235,11 +247,11 @@ def parallel_parse_post(post):
                     post.created_date = dateutil.parser.parse(date)
                 except TypeError:
                     pass
-                post.likes_count = like
-                post.comments_count = comment
-                post.repost_count = share
+                post.likes_count = update_count(like)
+                post.comments_count = update_count(comment)
+                post.repost_count = update_count(share)
                 post.last_modified = datetime.datetime.now()
-                post.sphinx_id = get_sphinx_id(post.id, post.group_id)
+                post.sphinx_id = get_sphinx_id(post.id)
                 post.content_hash = get_md5_text(text)
                 post.taken = 0
                 post.save()
@@ -254,3 +266,9 @@ def parallel_parse_post(post):
     post.taken = 0
     post.save()
     proxy_last_used(proxy)
+
+
+def update_count(data):
+    if data is not None:
+        return re.sub('\D', '', data)
+    return data

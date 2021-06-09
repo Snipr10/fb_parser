@@ -1,9 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
+from requests.exceptions import SSLError, ConnectTimeout, ProxyError
+from urllib3 import HTTPSConnectionPool
 
 from core import models
+from django.utils import timezone
 from fb_parser.utils.find_data import find_value, get_sphinx_id
-from fb_parser.utils.proxy import get_proxy, get_proxy_str
+from fb_parser.utils.proxy import get_proxy, get_proxy_str, stop_proxy
 
 
 def get_update_user(user_id):
@@ -15,7 +18,7 @@ def get_update_user(user_id):
             username, fb_id, href, logo = get_user_data('https://www.facebook.com/profile.php?id=' + user_id)
             if username is not None or fb_id is not None or href is not None:
                 models.User.objects.create(id=user_id, screen_name=username, url=href, sphinx_id=get_sphinx_id(href),
-                                           logo=logo)
+                                           logo=logo, last_modify=timezone.now())
 
 
 def get_user_data(url, attempt=0):
@@ -25,18 +28,20 @@ def get_user_data(url, attempt=0):
     if proxy is None:
         return None, None, None, None
     try:
-         # get proxy
-        # r = requests.get(url,  proxies=get_proxy_str(proxy)).text
-        res = requests.get('https://www.facebook.com/profile.php?id=100034163134835',  proxies=get_proxy_str(proxy))
+        res = requests.get(url,  proxies=get_proxy_str(proxy), timeout=60)
+        # res = requests.get('https://www.facebook.com/profile.php?id=100034163134835',  proxies=get_proxy_str(proxy))
         if res:
             s = BeautifulSoup(res.text)
             href = url
             if 'profile.php' in url:
                 fb_id = url.split('id=')[1]
                 try:
-                    href = s.find('link').attrs['href']
+                    href = s.find_all('meta', property="og:url")[0]['content']
                 except Exception:
-                    pass
+                    try:
+                        href = s.find('link').attrs['href']
+                    except Exception:
+                        pass
             else:
                 fb_id = find_value(res.text, 'userID', 3, separator='"')
             avatar = None
@@ -47,5 +52,14 @@ def get_user_data(url, attempt=0):
             return s.find("title").text, fb_id, href, avatar
         else:
             return get_user_data(url, attempt+1)
-    except Exception:
+    except (SSLError, ConnectionError, ConnectTimeout) as e:
+        stop_proxy(proxy)
+        return get_user_data(url, attempt)
+    except ProxyError:
+        stop_proxy(proxy)
+        return get_user_data(url, attempt)
+    except HTTPSConnectionPool:
+        stop_proxy(proxy)
+        return get_user_data(url, attempt)
+    except Exception as e:
         return get_user_data(url, attempt + 1)
