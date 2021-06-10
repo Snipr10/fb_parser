@@ -7,6 +7,7 @@ from core import models
 
 
 def get_proxy():
+    print('get proxy')
     # proxy = models.AllProxy.objects.filter(failed=False)
     proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
                                            | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4),
