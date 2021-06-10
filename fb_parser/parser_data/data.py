@@ -254,6 +254,8 @@ def parallel_parse_post(post):
                 # if owner_id is None or owner_id == post.group_id:
 
                 # get_user_data(url, attempt + 1)
+                print(owner_id)
+                print("owner_id")
 
                 if owner_id is None:
                     post.user_id = post.group_id
