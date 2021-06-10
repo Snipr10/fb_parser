@@ -20,20 +20,17 @@ logger = logging.getLogger(__file__)
 
 @app.task
 def start_parsing_by_keyword():
-    network_id = 1
+    network_id = 8
     print('start')
     pool_source = ThreadPoolExecutor(10)
     select_sources = models.Sources.objects.filter(
         Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
         status=1)
-    select_sources = models.Sources.objects.filter()
     key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
 
     key_words = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
                                               id__in=list(key_source.values_list('keyword_id', flat=True))
                                               ).order_by('last_modified')
-    key_words = models.Keyword.objects.filter()
-    print(key_words)
     for key_word in key_words:
         try:
             if key_word is not None:
