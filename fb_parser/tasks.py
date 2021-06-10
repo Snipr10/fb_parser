@@ -136,6 +136,8 @@ def add_proxy():
     for proxy in json.loads(new_proxy.text):
         ip = proxy['ip']
         port = proxy['port']
+        print(ip)
+        print(port)
         if not models.AllProxy.objects.filter(ip=ip, port=port).exists():
             proxies.append(models.AllProxy(ip=ip, port=port, login="test", proxy_password="test", last_used=timezone.now(),
                                            failed=0, errors=0, foregin=0, banned_fb=0, banned_y=0, banned_tw=0,
