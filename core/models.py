@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import datetime, timedelta
-import pytz
 
 
 class Post(models.Model):
