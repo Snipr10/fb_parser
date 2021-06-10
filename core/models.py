@@ -7,7 +7,7 @@ class Post(models.Model):
     id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField(null=True, blank=True)
     group_id = models.IntegerField()
-    found_date = models.DateTimeField(auto_now_add=True, blank=True)
+    # found_date = models.DateTimeField(auto_now_add=True, blank=True)
     repost_from = models.IntegerField(null=True, blank=True)
     created_date = models.DateTimeField(null=True, blank=True)
     likes_count = models.IntegerField(default=0, null=True, blank=True)
