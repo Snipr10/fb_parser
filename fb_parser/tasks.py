@@ -41,16 +41,16 @@ def start_parsing_by_keyword():
                 time = select_source.sources
                 if time is None:
                     time = 0
-                print('time')
                 if last_update is None or (last_update + datetime.timedelta(minutes=time) <
                                            update_time_timezone(timezone.localtime())):
                     print('get get_session')
+                    print(key_word.keyword)
                     work_credit, proxy, session, fb_dtsg, user_id, xs, token = get_session()
-                    print("1")
                     if fb_dtsg is not None:
                         key_word.taken = 1
                         key_word.save()
-                        pool_source.submit(search, work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
+                        search(work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
+                        # pool_source.submit(search, work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
         except Exception as e:
             logger.error(e)
             print(e)
@@ -102,8 +102,8 @@ def start_first_update_posts():
         try:
             if post is not None:
                 # todo get proxy
-                parallel_parse_post(post)
-                # pool_source.submit(parallel_parse_post, post)
+                # parallel_parse_post(post)
+                pool_source.submit(parallel_parse_post, post)
         except Exception as e:
             logger.error(e)
             print(e)
