@@ -16,4 +16,5 @@ from fb_parser.utils.find_data import find_value
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def test(request):
+    return models.Post.objects.all()
     start_first_update_posts()
