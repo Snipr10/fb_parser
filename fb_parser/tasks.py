@@ -3,6 +3,7 @@ import json
 import logging
 from datetime import timedelta
 
+import pytz
 import requests
 from django.db.models import Q
 from django.utils import timezone
@@ -93,7 +94,7 @@ def start_parsing_by_keyword():
 def start_first_update_posts():
     pool_source = ThreadPoolExecutor(15)
     print("start")
-    posts = models.Post.objects.filter(last_modified__lte=datetime.date(2000, 1, 1),
+    posts = models.Post.objects.filter(last_modified__lte=datetime(1, 1, 1, 0, 0, tzinfo=pytz.UTC),
                                        taken=0).order_by('found_date')[:100]
     print("posts")
     for post in posts:
