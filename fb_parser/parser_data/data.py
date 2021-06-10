@@ -176,7 +176,7 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
         last_story_fbid = None
         id = None
         print('get_ dataa')
-        print(res)
+        print(res.text)
 
         print( 'res_json')
         print(res_json)
