@@ -17,7 +17,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'start_first_update_posts': {
         'task': 'fb_parser.tasks.start_first_update_posts',
-        'schedule': crontab(minute='*/5')
+        'schedule': crontab(minute='*/1')
     },
     # 'start_parsing_by_keyword': {
     #     'task': 'fb_parser.tasks.start_parsing_by_keyword',
