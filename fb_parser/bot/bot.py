@@ -1,4 +1,6 @@
 import datetime
+import logging
+
 import requests
 import pyquery
 
@@ -6,6 +8,8 @@ from core import models
 from django.utils import timezone
 from fb_parser.utils.find_data import find_value
 from fb_parser.utils.proxy import get_proxy_str, proxy_last_used, get_proxy
+
+logger = logging.getLogger(__file__)
 
 
 def get_session():
@@ -25,12 +29,15 @@ def get_session():
     try:
         account = models.Account.objects.get(id=work_credit.account_id)
     except Exception as e:
+        logger.error(e)
         print(e)
         work_credit.delete()
         return get_session()
     try:
         proxy = models.AllProxy.objects.get(id=work_credit.proxy_id)
     except Exception as e:
+        logger.error(e)
+
         print(e)
         work_credit.delete()
         return get_session()
@@ -87,12 +94,14 @@ def login(session, email, password):
 
             return fb_dtsg, response.cookies['c_user'], response.cookies['xs'], token
         except Exception as e:
+            logger.error(e)
             print(e)
             # return fb_dtsg, response.cookies['c_user'], response.cookies['xs'], token
             print('response ok1')
 
             return None, None, None, None
     except Exception as e:
+        logger.error(e)
         print(e)
         print('response ok2')
 
@@ -140,6 +149,7 @@ def check_accounts(account, attempt=0):
 
             return False
     except Exception as e:
+        logger.error(e)
         proxy.failed = True
         proxy.banned_fb = True
         proxy.save()

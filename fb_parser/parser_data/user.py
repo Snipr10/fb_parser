@@ -1,3 +1,5 @@
+import logging
+
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import SSLError, ConnectTimeout, ProxyError
@@ -7,6 +9,8 @@ from core import models
 from django.utils import timezone
 from fb_parser.utils.find_data import find_value, get_sphinx_id
 from fb_parser.utils.proxy import get_proxy, get_proxy_str, stop_proxy
+
+logger = logging.getLogger(__file__)
 
 
 def get_update_user(user_id):
@@ -62,4 +66,6 @@ def get_user_data(url, attempt=0):
         stop_proxy(proxy)
         return get_user_data(url, attempt)
     except Exception as e:
+        logger.error(e)
         return get_user_data(url, attempt + 1)
+

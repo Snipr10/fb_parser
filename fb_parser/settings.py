@@ -75,13 +75,32 @@ WSGI_APPLICATION = 'fb_parser.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'parser',
+        'USER': 'parser',
+        'PASSWORD': '9ExtUS8uRyF9FSDf',
+        # 'USER': 'admin',
+        # 'PASSWORD': 'admin',
+        #  'HOST': '192.168.0.168',
+        'HOST': '192.168.5.11',
+
+        'PORT': '3306',
+        #       'OPTIONS': {
+        #         "init_command": "SET GLOBAL max_connections = 100000", #<-- The fix
+        #      }
+
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -125,10 +144,39 @@ STATIC_URL = '/static/'
 # BROKER_URL = 'pyamqp://rabbitmq:5672'
 # DOCKER
 # BROKER_URL = 'redis://redis:6378'
-BROKER_URL = 'redis://127.0.0.1:6379/1'
+BROKER_URL = 'redis://127.0.0.1:6379/2'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 BATCH_SIZE = 200
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "root": {"level": "INFO", "handlers": ["file"]},
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "django.log",
+            "formatter": "app",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True
+        },
+    },
+    "formatters": {
+        "app": {
+            "format": (
+                u"%(asctime)s [%(levelname)-8s] "
+                "(%(module)s.%(funcName)s) %(message)s"
+            ),
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+}

@@ -1,4 +1,6 @@
 import datetime
+import logging
+
 import dateutil.parser
 
 import json
@@ -16,11 +18,14 @@ from fb_parser.settings import BATCH_SIZE
 from fb_parser.utils.find_data import find_value, update_time_timezone, get_sphinx_id, get_md5_text
 from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used, stop_proxy
 
+logger = logging.getLogger(__file__)
+
 
 def get_class_text(soup, class_name):
     try:
         return soup.find_all("div", {"class": class_name})[0].text
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         return None
 
 
@@ -39,6 +44,7 @@ def get_data(url, proxy):
         try:
             soup = BeautifulSoup(res_text)
         except Exception as e:
+            logger.error(e)
             print(e)
             return None, None, None, None, None, None, None, None, imgs, owner_id
         try:
@@ -54,7 +60,8 @@ def get_data(url, proxy):
                             imgs.append(img['src'].replace('amp;', ''))
                 except KeyError:
                     pass
-        except Exception:
+        except Exception as e:
+            logger.error(e)
             pass
         # text = get_class_text(soup, 'bx')
         # if text is None:
@@ -125,6 +132,7 @@ def get_data(url, proxy):
 
                 owner_url = '/profile.php?' + url[url.find("&id=") + 1:]
         except Exception as e:
+            logger.error(e)
             print(e)
             owner_name = None
             owner_id = url[url.find("&id=") + 1:]
@@ -144,6 +152,7 @@ def get_data(url, proxy):
     #     stop_proxy(proxy)
     #     return get_data(url, get_proxy())
     except Exception as e:
+        logger.error(e)
         print(e)
         return None, None, None, None, None, None, None, None, imgs, owner_id
     return text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id
@@ -186,9 +195,11 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
                 search_by_word(work_credit, proxy, session, fb_dtsg_ag, user, xs, token, key_word, cursor, urls, result,
                                limit + 1)
             except Exception as e:
+                logger.error(e)
                 print(e)
         key_word.last_modified = update_time_timezone(timezone.localtime())
     except Exception as e:
+        logger.error(e)
         print(e)
         pass
     return result
@@ -207,6 +218,7 @@ def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, c
             posts.append(models.Post(id=int(data_url[0]),
                                      group_id=int(data_url[1])))
         except Exception as e:
+            logger.error(e)
             print(e)
     models.Post.objects.bulk_create(posts, batch_size=BATCH_SIZE, ignore_conflicts=True)
     key_word.taken = 0
@@ -258,10 +270,15 @@ def parallel_parse_post(post):
                 models.PostContent.objects.create(post_id=post.id, content=text)
                 get_update_user(post.user_id)
                 get_update_user(owner_id)
-
+                fb_photo = []
+                for img in imgs:
+                    fb_photo.append(models.Photo(id=post.id, href=img))
+                models.Photo.objects.bulk_create(fb_photo, batch_size=BATCH_SIZE, ignore_conflicts=True)
         except Exception as e:
+            logger.error(e)
             pass
     except Exception as e:
+        logger.error(e)
         pass
     post.taken = 0
     post.save()

@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 from datetime import timedelta
 
 import requests
@@ -13,6 +14,8 @@ from fb_parser.bot.bot import get_session, check_accounts
 from fb_parser.celery.celery import app
 from fb_parser.parser_data.data import search, parallel_parse_post
 from fb_parser.utils.find_data import update_time_timezone
+
+logger = logging.getLogger(__file__)
 
 
 @app.task
@@ -50,6 +53,7 @@ def start_parsing_by_keyword():
                         key_word.save()
                         pool_source.submit(search, work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
         except Exception as e:
+            logger.error(e)
             print(e)
             try:
                 pass
@@ -99,6 +103,7 @@ def start_first_update_posts():
                 # parallel_parse_post(post)
                 pool_source.submit(parallel_parse_post, post)
         except Exception as e:
+            logger.error(e)
             print(e)
             # try:
             #     stop_proxy(proxy)

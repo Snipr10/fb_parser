@@ -109,7 +109,7 @@ class Photo(models.Model):
     class Meta:
         db_table = 'prsr_parser_fb_photos'
 
-
+# ???
 class PostPhoto(models.Model):
     post_id = models.IntegerField()
     photo_id = models.IntegerField(primary_key=True)
