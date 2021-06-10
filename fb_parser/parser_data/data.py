@@ -174,7 +174,7 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
         print("url")
         print(url)
         print(headers)
-        print(res)
+        print(get_proxy_str(proxy))
         res_json = json.loads(res.text.replace("for (;;);", ''))
         last_story_fbid = None
         id = None
