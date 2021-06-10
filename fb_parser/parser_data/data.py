@@ -161,6 +161,7 @@ def get_data(url, proxy):
 def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[],
                    limit=0):
     try:
+        print("start search")
         q = key_word.keyword
         url = 'https://m.facebook.com/search/posts/?q=%s&source=filter&pn=8&isTrending=0&' \
               'fb_dtsg_ag=%s&__a=AYlcAmMg3mcscBWQCbVswKQbSUum-R7WYoZMoRSwBlJp6gjuv2v2LwCzB_1ZZe4khj4N2vM7UjQWttgYqsq7DxeUlgmEVmSge5LOz1ZdWHEGQQ' % (
@@ -207,6 +208,7 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
 
 def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[],
            limit=0):
+    print("start search search")
     result = search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[],
                             result=[], limit=0)
     posts = []
