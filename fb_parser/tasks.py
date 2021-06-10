@@ -97,6 +97,7 @@ def start_first_update_posts():
                                        taken=0).order_by('found_date')[:100]
     print("posts")
     for post in posts:
+        print(post)
         try:
             if post is not None:
                 # todo get proxy
@@ -109,6 +110,7 @@ def start_first_update_posts():
             #     stop_proxy(proxy)
             # except Exception as e:
             #     logger.warning(e)
+            print('post bad')
             post.taken = 0
             post.save()
 
