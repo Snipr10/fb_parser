@@ -214,7 +214,9 @@ def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, c
     for res in result:
         data_url = res.split('&')
         try:
+            print('id')
             print(int(data_url[0]))
+            print('group_id')
             print(int(data_url[1]))
             posts.append(models.Post(id=int(data_url[0]),
                                      group_id=int(data_url[1])))
