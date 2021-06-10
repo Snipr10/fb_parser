@@ -171,10 +171,13 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
         headers = {'cookie': 'c_user=' + user + '; xs=' + xs + ';'}
 
         res = requests.get(url, headers=headers)
+        print(res)
         res_json = json.loads(res.text.replace("for (;;);", ''))
         last_story_fbid = None
         id = None
         print('get_ dataa')
+        print(res)
+
         print( 'res_json')
         print(res_json)
         print("html")
