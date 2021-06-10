@@ -16,7 +16,7 @@ class Post(models.Model):
     trust = models.IntegerField(null=True, blank=True)
     sphinx_id = models.IntegerField(default=0)
     # updated = models.DateTimeField(null=True, blank=True)
-    # last_modified = models.DateTimeField(default=datetime(1, 1, 1, 0, 0))
+    last_modified = models.DateTimeField(default=datetime(1, 1, 1, 0, 0))
     content_hash = models.CharField(max_length=32, null=True, blank=True)
     taken = models.BooleanField(default=False)
 
