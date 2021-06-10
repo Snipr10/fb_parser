@@ -1,3 +1,4 @@
+import pytz
 from django.db import models
 from datetime import datetime, timedelta
 
@@ -14,8 +15,8 @@ class Post(models.Model):
     repost_count = models.IntegerField(default=0, null=True, blank=True)
     trust = models.IntegerField(null=True, blank=True)
     sphinx_id = models.IntegerField(default=0)
-    # updated = models.DateTimeField(null=True, blank=True)
-    # # last_modified = models.DateTimeField()
+    updated = models.DateTimeField(null=True, blank=True)
+    last_modified = models.DateTimeField(default=datetime(1, 1, 1, 0, 0, tzinfo=pytz.UTC))
     content_hash = models.CharField(max_length=32, null=True, blank=True)
     taken = models.BooleanField(default=False)
 
