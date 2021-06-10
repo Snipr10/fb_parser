@@ -216,7 +216,7 @@ def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, c
         try:
 
             posts.append(models.Post(id=int(data_url[0]),
-                                     group_id=int(data_url[1])))
+                                     group_id=int(data_url[1]), found_date=datetime.datetime.now()))
         except Exception as e:
             logger.error(e)
             print(e)
