@@ -50,7 +50,9 @@ def start_parsing_by_keyword():
                         key_word.taken = 1
                         key_word.save()
                         search(work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
-                        # pool_source.submit(search, work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
+                        pool_source.submit(search, work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
+                    else:
+                        work_credit.delete()
         except Exception as e:
             logger.error(e)
             print(e)
