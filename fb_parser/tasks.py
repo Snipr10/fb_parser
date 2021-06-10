@@ -96,6 +96,8 @@ def start_first_update_posts():
     posts = models.Post.objects.filter(last_modified__lte=datetime.datetime.now(),
                                        taken=0).order_by('found_date')[:100]
     for post in posts:
+        post.taken = 1
+        post.save()
         print(post)
         try:
             if post is not None:

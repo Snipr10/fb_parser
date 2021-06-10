@@ -240,11 +240,13 @@ def parallel_parse_post(post):
     proxy = get_proxy()
     print("proxy")
     if proxy is None:
-        return
-    try:
-        print("post")
-        post.taken = 1
+        post.taken = 0
         post.save()
+        return
+    print("start")
+
+    try:
+
         try:
             text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id = get_data_from_url(post,
                                                                                                                proxy)
