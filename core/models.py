@@ -227,7 +227,7 @@ class AllProxy(models.Model):
     login = models.CharField(max_length=256)
     proxy_password = models.CharField(max_length=256)
     last_used = models.DateTimeField(null=True, blank=True)
-    last_us_y = models.DateTimeField(null=True, blank=True)
+    last_used_y = models.DateTimeField(null=True, blank=True)
     failed = models.IntegerField()
     errors = models.IntegerField()
     foregin = models.IntegerField()
