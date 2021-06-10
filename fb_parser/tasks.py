@@ -93,12 +93,8 @@ def start_parsing_by_keyword():
 def start_first_update_posts():
     pool_source = ThreadPoolExecutor(15)
     print("start")
-    # posts = models.Post.objects.filter(last_modified__lte=datetime.datetime.now(),
-    #                                    taken=0).order_by('found_date')[:100]
-    print(models.PostContent.objects.all().first().post_id)
-    posts = models.Post.objects.filter(taken=0).first()
-    print(posts.id)
-    print("posts")
+    posts = models.Post.objects.filter(last_modified__lte=datetime.datetime.now(),
+                                       taken=0).order_by('found_date')[:100]
     for post in posts:
         print(post)
         try:
