@@ -154,8 +154,8 @@ def get_data(url, proxy):
     except Exception as e:
         logger.error(e)
         print(e)
-        return None, None, None, None, None, None, None, None, imgs, owner_id
-    return text, date, watch, like, share, comment, owner_name, owner_url, imgs, owner_id
+        return None, None, None, None, None, None, None, None, imgs, update_count(owner_id)
+    return text, date, watch, like, share, comment, owner_name, owner_url, imgs, update_count(owner_id)
 
 
 def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[],
