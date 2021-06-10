@@ -273,8 +273,11 @@ def parallel_parse_post(post):
                 post.content_hash = get_md5_text(text)
                 post.taken = 0
                 post.save()
-
-                models.PostContent.objects.create(post_id=post.id, content=text, ignore_conflicts=True)
+                try:
+                    models.PostContent.objects.create(post_id=post.id, content=text)
+                except Exception as e:
+                    logger.error(e)
+                    pass
                 get_update_user(post.user_id)
                 get_update_user(owner_id)
                 fb_photo = []
