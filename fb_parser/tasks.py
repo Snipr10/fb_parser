@@ -95,6 +95,7 @@ def start_first_update_posts():
     print("start")
     # posts = models.Post.objects.filter(last_modified__lte=datetime.datetime.now(),
     #                                    taken=0).order_by('found_date')[:100]
+    print(models.PostContent.objects.all().first().post_id)
     posts = models.Post.objects.filter(taken=0).first()
     print(posts.id)
     print("posts")

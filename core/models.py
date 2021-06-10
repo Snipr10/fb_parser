@@ -17,7 +17,6 @@ class Post(models.Model):
     updated = models.DateTimeField(null=True, blank=True)
     # last_modified = models.DateTimeField()
     content_hash = models.CharField(max_length=32, null=True, blank=True)
-    # add
     taken = models.BooleanField(default=False)
 
     class Meta:
