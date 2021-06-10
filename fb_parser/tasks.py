@@ -13,6 +13,7 @@ from core.models import WorkCred
 from fb_parser.bot.bot import get_session, check_accounts
 from fb_parser.celery.celery import app
 from fb_parser.parser_data.data import search, parallel_parse_post
+from fb_parser.settings import network_id
 from fb_parser.utils.find_data import update_time_timezone
 
 logger = logging.getLogger(__file__)
@@ -20,7 +21,6 @@ logger = logging.getLogger(__file__)
 
 @app.task
 def start_parsing_by_keyword():
-    network_id = 8
     print('start')
     pool_source = ThreadPoolExecutor(10)
     select_sources = models.Sources.objects.filter(

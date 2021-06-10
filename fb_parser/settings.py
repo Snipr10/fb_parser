@@ -151,6 +151,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 BATCH_SIZE = 200
 
+network_id = 8
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
