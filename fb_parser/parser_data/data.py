@@ -175,7 +175,10 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
         last_story_fbid = None
         id = None
         print('get_ dataa')
-        print( res_json['payload']['actions'][0]['html'])
+        print( 'res_json')
+        print(res_json)
+        print("html")
+
         for story in re.findall(r'story_fbid=\d+&amp;id=\d+', res_json['payload']['actions'][0]['html']):
             data_url = story.split('&amp;')
             if last_story_fbid != data_url[0] or id != data_url[1]:
