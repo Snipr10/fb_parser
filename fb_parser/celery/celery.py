@@ -19,16 +19,16 @@ app.conf.beat_schedule = {
         'task': 'fb_parser.tasks.start_first_update_posts',
         'schedule': crontab(minute='*/5')
     },
-    'start_parsing_by_keyword': {
-        'task': 'fb_parser.tasks.start_parsing_by_keyword',
-        'schedule': crontab(minute='*/5')
-    },
-    'add_work_credential': {
-        'task': 'fb_parser.tasks.add_work_credential',
-        'schedule': crontab(minute='*/5')
-    },
-    'add_proxy': {
-        'task': 'fb_parser.tasks.add_proxy',
-        'schedule': crontab(minute='*/5')
-    },
+    # 'start_parsing_by_keyword': {
+    #     'task': 'fb_parser.tasks.start_parsing_by_keyword',
+    #     'schedule': crontab(minute='*/5')
+    # },
+    # 'add_work_credential': {
+    #     'task': 'fb_parser.tasks.add_work_credential',
+    #     'schedule': crontab(minute='*/5')
+    # },
+    # 'add_proxy': {
+    #     'task': 'fb_parser.tasks.add_proxy',
+    #     'schedule': crontab(minute='*/5')
+    # },
 }

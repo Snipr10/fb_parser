@@ -26,6 +26,8 @@ def start_parsing_by_keyword():
     select_sources = models.Sources.objects.filter(
         Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
         status=1)
+    if not select_sources.exists():
+        return
     key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
 
     key_words = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
