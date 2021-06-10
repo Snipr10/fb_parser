@@ -238,9 +238,11 @@ def get_data_from_url(post, proxy):
 
 def parallel_parse_post(post):
     proxy = get_proxy()
+    print("proxy")
     if proxy is None:
         return
     try:
+        print("post")
         post.taken = 1
         post.save()
         try:
