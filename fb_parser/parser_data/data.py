@@ -201,6 +201,9 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
                 logger.error(e)
                 print(e)
         print("ok")
+        print("ok res")
+        print(result)
+        print("ok res1")
         key_word.last_modified = update_time_timezone(timezone.localtime())
     except Exception as e:
         logger.error(e)
