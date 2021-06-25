@@ -49,7 +49,7 @@ def start_parsing_by_keyword():
                     if fb_dtsg is not None:
                         key_word.taken = 1
                         key_word.save()
-                        search(work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
+                        # search(work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
                         pool_source.submit(search, work_credit, session, proxy, fb_dtsg, user_id, xs, token, key_word)
                     else:
                         if work_credit is not None:
