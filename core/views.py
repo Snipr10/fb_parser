@@ -31,7 +31,14 @@ def test(request):
     print('session start')
 
     fb_dtsg, user_id, xs, token = login(session, "79608541372", 'sBHsy86767')
-
+    print('fb_dtsg')
+    print(fb_dtsg)
+    print('user_id')
+    print(user_id)
+    print('xs')
+    print(xs)
+    print('token')
+    print(token)
     q = 'key'
     url = 'https://m.facebook.com/search/posts/?q=%s&source=filter&pn=8&isTrending=0&' \
           'fb_dtsg_ag=%s&__a=AYlcAmMg3mcscBWQCbVswKQbSUum-R7WYoZMoRSwBlJp6gjuv2v2LwCzB_1ZZe4khj4N2vM7UjQWttgYqsq7DxeUlgmEVmSge5LOz1ZdWHEGQQ' % (
