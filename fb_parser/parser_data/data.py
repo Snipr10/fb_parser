@@ -204,13 +204,13 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
             print('res')
             print(res)
         cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
-        if limit <= 10:
-            try:
-                search_by_word(work_credit, proxy, session, fb_dtsg_ag, user, xs, token, key_word, cursor, urls, result,
-                               limit + 1)
-            except Exception as e:
-                logger.error(e)
-                print(e)
+        # if limit <= 10:
+        #     try:
+        #         search_by_word(work_credit, proxy, session, fb_dtsg_ag, user, xs, token, key_word, cursor, urls, result,
+        #                        limit + 1)
+        #     except Exception as e:
+        #         logger.error(e)
+        #         print(e)
         print("ok")
         print("ok res")
         print(result)
