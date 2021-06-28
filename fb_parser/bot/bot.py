@@ -74,13 +74,13 @@ def login(session, email, password):
         # load Facebook's cookies.
         print('response 0')
 
-        response = session.get('https://m.facebook.com', proxy=proxy)
+        response = session.get('https://m.facebook.com', proxies=proxy)
         print('response 1')
         # login to Facebook
         response = session.post('https://m.facebook.com/login.php', data={
             'email': email,
             'pass': password
-        }, proxy=proxy, allow_redirects=False)
+        }, proxies=proxy, allow_redirects=False)
         print('response 2')
 
         # If c_user cookie is present, login was successful
@@ -88,7 +88,7 @@ def login(session, email, password):
             # if 'c_user' in response.cookies:
 
             # Make a request to homepage to get fb_dtsg token
-            homepage_resp = session.get('https://m.facebook.com/home.php', proxy=proxy)
+            homepage_resp = session.get('https://m.facebook.com/home.php', proxies=proxy)
             dom = pyquery.PyQuery(homepage_resp.text.encode('utf8'))
             fb_dtsg = dom('input[name="fb_dtsg"]').val()
             token = find_value(homepage_resp.text, 'dtsg_ag":{"token":')
