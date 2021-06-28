@@ -29,8 +29,8 @@ def start_parsing_by_keyword():
     if not select_sources.exists():
         return
     key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
-
-    key_words = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
+    # delete id
+    key_words = models.Keyword.objects.filter(id=1685425, network_id=network_id, enabled=1, taken=0,
                                               id__in=list(key_source.values_list('keyword_id', flat=True))
                                               ).order_by('last_modified')
     for key_word in key_words:

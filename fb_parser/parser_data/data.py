@@ -179,11 +179,11 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
         last_story_fbid = None
         id = None
         print('get_ dataa')
-        print(res.text)
-
-        print( 'res_json')
-        print(res_json)
-        print("html")
+        # print(res.text)
+        #
+        # print( 'res_json')
+        # print(res_json)
+        # print("html")
 
         for story in re.findall(r'story_fbid=\d+&amp;id=\d+', res_json['payload']['actions'][0]['html']):
             data_url = story.split('&amp;')
@@ -200,7 +200,9 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
                     id = data_url[1]
                     urls.append(story)
                     result.append(data_url[1] + '&' + data_url[0].replace('groups/', ''))
-
+        for res in result:
+            print('res')
+            print(res)
         cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
         if limit <= 10:
             try:
@@ -240,7 +242,7 @@ def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, c
         except Exception as e:
             logger.error(e)
             print(e)
-        
+
     models.Post.objects.bulk_create(posts, batch_size=BATCH_SIZE, ignore_conflicts=True)
     key_word.taken = 0
     key_word.save()
