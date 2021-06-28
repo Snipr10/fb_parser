@@ -240,6 +240,7 @@ def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, c
         except Exception as e:
             logger.error(e)
             print(e)
+        
     models.Post.objects.bulk_create(posts, batch_size=BATCH_SIZE, ignore_conflicts=True)
     key_word.taken = 0
     key_word.save()
