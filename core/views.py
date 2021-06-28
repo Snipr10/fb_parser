@@ -21,16 +21,17 @@ from fb_parser.utils.find_data import find_value
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def test(request):
-    proxy = {'http': 'http://test:test@125.25.33.212:8080', 'https': 'https://test:test@125.25.33.212:8080'}
+    proxy = {'http': 'http://test:test@14.207.202.160:8080', 'https': 'https://test:test@14.207.202.160:8080'}
 
     session = requests.session()
-    session.proxies.update(proxy)
+    session.proxies = proxy
+    # session.proxies.update(proxy)
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:39.0) Gecko/20100101 Firefox/39.0'
     })
     print('session start')
 
-    fb_dtsg, user_id, xs, token = login(session, "79608541372", 'sBHsy86767')
+    fb_dtsg, user_id, xs, token = login(session, "79670182743", 'cJYCsJYClsHBCwHBCl29205')
     print('fb_dtsg')
     print(fb_dtsg)
     print('user_id')
