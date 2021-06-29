@@ -169,22 +169,10 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
         if cursor:
             url = url + "&cursor=" + cursor
         headers = {'cookie': 'c_user=' + user + '; xs=' + xs + ';'}
-
         res = requests.get(url, headers=headers, proxies=get_proxy_str(proxy))
-        print("url")
-        print(url)
-        print(headers)
-        print(get_proxy_str(proxy))
         res_json = json.loads(res.text.replace("for (;;);", ''))
         last_story_fbid = None
         id = None
-        print('get_ dataa')
-        print(res.text)
-        #
-        # print( 'res_json')
-        # print(res_json)
-        # print("html")
-
         for story in re.findall(r'story_fbid=\d+&amp;id=\d+', res_json['payload']['actions'][0]['html']):
             data_url = story.split('&amp;')
             if last_story_fbid != data_url[0] or id != data_url[1]:
@@ -208,7 +196,7 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
         print('cursor ' + str(cursor))
         if limit <= 10 and cursor is not None:
             try:
-                search_by_word(work_credit, proxy, session, fb_dtsg_ag, user, xs, token, key_word, cursor, urls, result,
+                search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor, urls, result,
                                limit + 1)
             except Exception as e:
                 logger.error(e)
