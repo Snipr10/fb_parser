@@ -245,8 +245,10 @@ def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, c
         except Exception as e:
             logger.error(e)
             print(e)
+    print("save post")
     for post in posts:
         try:
+            print("try save post")
             models.Post.objects.bulk_create([post], batch_size=BATCH_SIZE)
         except Exception as e:
             print("SAVE"  + str(e))
