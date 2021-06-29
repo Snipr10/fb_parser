@@ -200,12 +200,10 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
                     id = data_url[1]
                     urls.append(story)
                     result.append(data_url[1] + '&' + data_url[0].replace('groups/', ''))
-        for res in result:
-            print('res')
-            print(res)
         try:
             cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
-        except Exception:
+        except Exception as e:
+            print("cursos ex " + str(e))
             cursor = None
         print('cursor ' + str(cursor))
         if limit <= 10 and cursor is not None:
