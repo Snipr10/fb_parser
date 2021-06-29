@@ -16,7 +16,7 @@ def get_proxy():
                                            ).order_by('last_used').first()
     if proxy is not None:
         proxy_last_used(proxy)
-        session = generate_proxy_session('test', 'test', proxy.ip, proxy.port)
+        session = generate_proxy_session(proxy.login, proxy.proxy_password, proxy.ip, proxy.port)
         if check_facebook_url(session):
             return proxy
         else:
