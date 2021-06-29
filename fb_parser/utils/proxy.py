@@ -25,9 +25,10 @@ def get_proxy():
             return get_proxy()
     return None
 
+
 def check_facebook_url(session):
     try:
-        response = session.get('https://m.facebook.com', timeout=15)
+        response = session.get('https://m.facebook.com', timeout=25)
         if response.ok:
             return True
     except Exception as e:
