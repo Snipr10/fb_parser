@@ -42,7 +42,7 @@ def start_parsing_by_keyword():
                 if time is None:
                     time = 0
                 if last_update is None or (last_update + datetime.timedelta(minutes=time) <
-                                           update_time_start_parsing_by_keywordtimezone(timezone.localtime())):
+                                           update_time_timezone(timezone.localtime())):
                     print('get get_session')
                     print(key_word.keyword)
                     work_credit, proxy, session, fb_dtsg, user_id, xs, token = get_session()
