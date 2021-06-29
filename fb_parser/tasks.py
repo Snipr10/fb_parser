@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 from datetime import timedelta
+import random
 
 import requests
 from django.db.models import Q
@@ -149,3 +150,105 @@ def add_proxy():
 
                                            ))
     models.AllProxy.objects.bulk_create(proxies, batch_size=200, ignore_conflicts=True)
+
+
+@app.task
+def update_proxy():
+    print("update_proxy")
+    # key = models.Keys.objects.all().first().proxykey
+    key = 'd73007770373106ac0256675c604bc22'
+
+    new_proxy = requests.get(
+        "https://api.best-proxies.ru/proxylist.json?key=%s&twitter=1&type=http,https&speed=1,2" % key,
+        timeout=60)
+
+    proxies = []
+    limit = 0
+    for proxy in json.loads(new_proxy.text):
+        host = proxy['ip']
+        port = proxy['port']
+        print(host)
+        print(port)
+
+        session = generate_proxy_session('test', 'test', host, port)
+        if not models.AllProxy.objects.filter(host=host, port=port).exists():
+            if check_facebook_url(session):
+                if port == '8080':
+                    if check_proxy_available_for_facebook(session):
+                        proxies.append(models.AllProxy(ip=host, port=port, login="test", proxy_password="test",
+                                                       last_used=timezone.now(),
+                                                       failed=0, errors=0, foregin=0, banned_fb=0, banned_y=0,
+                                                       banned_tw=0,
+                                                       valid_untill=timezone.now() + timedelta(days=3), v6=0,
+                                                       last_modified=timezone.now(),
+                                                       checking=0
+                                                       ))
+                        # models.Proxy.objects.create(host=host, port=port, login="test", password="test")
+                else:
+                    proxies.append(models.AllProxy(ip=host, port=port, login="test", proxy_password="test",
+                                                   last_used=timezone.now(),
+                                                   failed=0, errors=0, foregin=0, banned_fb=0, banned_y=0,
+                                                   banned_tw=0,
+                                                   valid_untill=timezone.now() + timedelta(days=3), v6=0,
+                                                   last_modified=timezone.now(),
+                                                   checking=0
+
+                                                   ))
+
+def check_facebook_url(session):
+    try:
+        response = session.get('https://m.facebook.com', timeout=15)
+        if response.ok:
+            return True
+    except Exception as e:
+        print(e)
+        pass
+    return False
+
+
+def generate_proxy_session(proxy_login, proxy_password, proxy_host, proxy_port):
+    session = requests.session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:39.0) Gecko/20100101 Firefox/39.0'
+    })
+    proxy_str = f"{proxy_login}:{proxy_password}@{proxy_host}:{proxy_port}"
+    proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
+
+    session.proxies.update(proxies)
+    return session
+
+
+def check_proxy_available_for_facebook(session):
+    try:
+        accounts = models.Account.objects.filter(banned=False).order_by('id')[:500]
+        account = random.choice(accounts)
+        # login = "+79910404158"
+        # password = "yBZHsBZHou761"
+        print(account.id)
+        response = session.post('https://m.facebook.com/login.php', data={
+            'email': account.login,
+            'pass': account.password,
+            # 'email': login,
+            # 'pass': password
+        }, allow_redirects=False, timeout=10)
+        start_page = session.get('https://www.facebook.com/', timeout=10)
+        print(start_page)
+        if 'login/?privacy_mutation_token' in start_page.url:
+            account.banned = True
+            account.save()
+            return check_proxy_available_for_facebook(session)
+        if 'checkpoint' not in start_page.url and '/login/device-based/regulr/' not in start_page.url:
+            print(str(account.id) + " ok")
+            return True
+    except Exception as e:
+        print(e)
+        pass
+    print(str(account.id) + " bad")
+    return False
+
+
+@app.task
+def check_not_available_accounts():
+    for account in models.Account.objects.filter().order_by("-id")[:500]:
+        if not models.WorkCred.objects.filter(account_id=account.id).exists():
+            check_accounts(account, attempt=0)

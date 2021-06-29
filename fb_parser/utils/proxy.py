@@ -11,7 +11,7 @@ def get_proxy():
     # proxy = models.AllProxy.objects.filter(failed=False)
     proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
                                            | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4),
-                                               banned_fb=False, login='test'),
+                                               banned_fb=False, login='test', port=8080),
                                            ).order_by('last_used').first()
     if proxy is not None:
         proxy_last_used(proxy)

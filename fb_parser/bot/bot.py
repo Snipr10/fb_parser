@@ -132,28 +132,28 @@ def check_accounts(account, attempt=0):
             'pass': password
         }, allow_redirects=False)
 
-        # If c_user cookie is present, login was successful
-        print("check cookies")
-        if 'c_user' in response.cookies:
-            print("account ok " + email)
-            # account.available = True
-            # account.banned = False
-            # account.save()
-            try:
-                models.WorkCred.objects.create(account_id=account.id, proxy_id=proxy.id, locked=False)
-            except Exception:
-                print("cannot create WorkCredentials ")
-            return True
-        else:
-            print("account disable " + email)
+        if response.ok:
+            if 'c_user' in response.cookies:
+                start_page = session.get('https://www.facebook.com/')
+                if 'checkpoint' not in start_page.url:
+                    print("account ok " + email)
+                    account.available = True
+                    account.banned = False
+                    account.save()
+                    try:
+                        models.WorkCred.objects.create(account_id=account.id, proxy_id=proxy.id, locked=False)
 
-            return False
-    except Exception as e:
-        logger.error(e)
-        proxy.failed = True
-        proxy.banned_fb = True
+                    except Exception:
+                        print("cannot create WorkCredentials ")
+                    return True
+                print("account disable " + email)
+            else:
+                account.banned = False
+                account.save()
+        return False
+    except Exception:
+        proxy.available = False
         proxy.save()
-        print(e)
         if attempt < 5:
             print("account Exception " + email)
 
