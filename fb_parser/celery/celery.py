@@ -30,12 +30,12 @@ app.conf.beat_schedule = {
     'add_proxy': {
         # 'task': 'fb_parser.tasks.add_proxy',
         'task': 'fb_parser.tasks.update_proxy',
-        'schedule': crontab(minute='*/1')
+        'schedule': crontab(minute='*/10')
     },
 
     'check_not_available_accounts': {
         'task': 'add_posts.tasks.check_not_available_accounts',
         'schedule': crontab(
-            minute='*/3')
+            minute='*/14')
     },
 }
