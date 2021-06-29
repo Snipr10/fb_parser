@@ -207,6 +207,7 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
             cursor = find_value(res.text, 'cursor=', num_sep_chars=0, separator='&amp')
         except Exception:
             cursor = None
+        print('cursor ' + str(cursor))
         if limit <= 10 and cursor is not None:
             try:
                 search_by_word(work_credit, proxy, session, fb_dtsg_ag, user, xs, token, key_word, cursor, urls, result,
