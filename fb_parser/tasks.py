@@ -16,6 +16,7 @@ from fb_parser.celery.celery import app
 from fb_parser.parser_data.data import search, parallel_parse_post
 from fb_parser.settings import network_id
 from fb_parser.utils.find_data import update_time_timezone
+from fb_parser.utils.proxy import generate_proxy_session, check_facebook_url
 
 logger = logging.getLogger(__file__)
 
@@ -194,28 +195,6 @@ def update_proxy():
                                                    checking=0
 
                                                    ))
-
-def check_facebook_url(session):
-    try:
-        response = session.get('https://m.facebook.com', timeout=15)
-        if response.ok:
-            return True
-    except Exception as e:
-        print(e)
-        pass
-    return False
-
-
-def generate_proxy_session(proxy_login, proxy_password, proxy_host, proxy_port):
-    session = requests.session()
-    session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:39.0) Gecko/20100101 Firefox/39.0'
-    })
-    proxy_str = f"{proxy_login}:{proxy_password}@{proxy_host}:{proxy_port}"
-    proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
-
-    session.proxies.update(proxies)
-    return session
 
 
 def check_proxy_available_for_facebook(session):
