@@ -18,7 +18,7 @@ def get_proxy(is_8080=False):
     else:
         proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
                                            | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4),
-                                               banned_fb=False, login='test'),
+                                               banned_fb=False),
                                            ).order_by('last_used').first()
     if proxy is not None:
         proxy_last_used(proxy)
