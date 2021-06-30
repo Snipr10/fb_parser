@@ -33,7 +33,7 @@ def get_data(url, proxy):
     # user Proxy
     imgs = []
     owner_id = None
-
+    print('get_data')
     try:
         # todo time out requests
         # time.sleep(60)
@@ -255,12 +255,20 @@ def get_data_from_url(post, proxy):
     return get_data(url, proxy)
 
 
+def post_taken(post, taken=0):
+    post.taken = taken
+    post.save()
+
+
 def parallel_parse_post(post):
-    proxy = get_proxy()
+    try:
+        proxy = get_proxy()
+    except Exception:
+        post_taken(post)
+        return
     print("proxy")
     if proxy is None:
-        post.taken = 0
-        post.save()
+        post_taken(post)
         return
     print("start")
 
