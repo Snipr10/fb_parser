@@ -7,12 +7,18 @@ from django.utils import timezone
 from core import models
 
 
-def get_proxy():
+def get_proxy(is_8080=False):
     print('get proxy')
     # proxy = models.AllProxy.objects.filter(failed=False)
-    proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
+    if is_8080:
+        proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
                                            | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4),
                                                banned_fb=False, login='test', port=8080),
+                                           ).order_by('last_used').first()
+    else:
+        proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
+                                           | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4),
+                                               banned_fb=False, login='test'),
                                            ).order_by('last_used').first()
     if proxy is not None:
         proxy_last_used(proxy)
@@ -22,7 +28,7 @@ def get_proxy():
         else:
             proxy.banned_fb = True
             proxy.save()
-            return get_proxy()
+            return get_proxy(is_8080)
     return None
 
 

@@ -116,7 +116,7 @@ def check_accounts(account, attempt=0):
         'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:39.0) Gecko/20100101 Firefox/39.0'
     })
 
-    proxy = get_proxy()
+    proxy = get_proxy(is_8080=True)
     if proxy is None:
         print('add proxy')
         return
