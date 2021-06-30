@@ -267,6 +267,7 @@ def parallel_parse_post(post):
         post_taken(post)
         return
     print("proxy")
+    print(proxy)
     if proxy is None:
         post_taken(post)
         return
