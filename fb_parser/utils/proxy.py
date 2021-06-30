@@ -12,14 +12,16 @@ def get_proxy(is_8080=False):
     # proxy = models.AllProxy.objects.filter(failed=False)
     if is_8080:
         proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
-                                           | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4),
-                                               banned_fb=False, login='test', port=8080),
-                                           ).order_by('last_used').first()
+                                               | Q(last_used__lte=(timezone.localtime()) + datetime.timedelta(hours=3)
+                                                                  - datetime.timedelta(minutes=4),
+                                                   banned_fb=False, login='test', port=8080),
+                                               ).order_by('last_used').first()
     else:
         proxy = models.AllProxy.objects.filter(Q(last_used__isnull=True)
-                                           | Q(last_used__lte=(timezone.localtime()) - datetime.timedelta(minutes=4),
-                                               banned_fb=False),
-                                           ).order_by('last_used').first()
+                                               | Q(last_used__lte=(timezone.localtime()) + datetime.timedelta(hours=3)
+                                                                  - datetime.timedelta(minutes=4),
+                                                   banned_fb=False),
+                                               ).order_by('last_used').first()
     if proxy is not None:
         proxy_last_used(proxy)
         session = generate_proxy_session(proxy.login, proxy.proxy_password, proxy.ip, proxy.port)
@@ -61,7 +63,7 @@ def get_proxy_str(proxy):
 
 
 def proxy_last_used(proxy):
-    proxy.last_used = datetime.datetime.now()
+    proxy.last_used = datetime.datetime.now() + datetime.timedelta(hours=3)
     proxy.save()
 
 
