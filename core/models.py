@@ -12,7 +12,9 @@ class Post(models.Model):
     created_date = models.DateTimeField(null=True, blank=True)
     likes_count = models.IntegerField(default=0, null=True, blank=True)
     comments_count = models.IntegerField(default=0, null=True, blank=True)
-    repost_count = models.IntegerField(default=0, null=True, blank=True)
+    repost_count = models.IntegerField(default=-1, null=True, blank=True)
+    # repost_count = models.IntegerField(default=0, null=True, blank=True)
+
     trust = models.IntegerField(null=True, blank=True)
     sphinx_id = models.IntegerField(null=True, blank=True)
     updated = models.DateField(null=True, blank=True)

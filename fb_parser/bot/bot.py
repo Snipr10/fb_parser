@@ -146,6 +146,9 @@ def check_accounts(account, attempt=0):
                     except Exception:
                         print("cannot create WorkCredentials ")
                     return True
+                else:
+                    account.available = False
+                    account.save()
                 print("account disable " + email)
             else:
                 account.banned = False
