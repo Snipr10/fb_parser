@@ -20,7 +20,7 @@ class Post(models.Model):
     updated = models.DateField(null=True, blank=True)
     last_modified = models.DateTimeField(default=datetime(1, 1, 1, 0, 0))
     content_hash = models.CharField(max_length=32, null=True, blank=True)
-    taken = models.BooleanField(default=False)
+    taken = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'prsr_parser_fb_posts'
