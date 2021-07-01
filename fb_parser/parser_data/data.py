@@ -299,7 +299,7 @@ def parallel_parse_post(post):
                 post.last_modified = datetime.datetime.now()
                 post.sphinx_id = get_sphinx_id(post.id)
                 post.content_hash = get_md5_text(text)
-                post.taken = 0
+                post.taken = -1
                 post.save()
                 try:
                     models.PostContent.objects.create(post_id=post.id, content=text)
