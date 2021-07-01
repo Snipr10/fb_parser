@@ -37,6 +37,7 @@ def get_proxy(is_8080=False):
 def check_facebook_url(session):
     try:
         response = session.get('https://m.facebook.com', timeout=25)
+        print(response.status_code)
         if response.ok:
             return True
     except Exception as e:
