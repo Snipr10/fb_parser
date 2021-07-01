@@ -172,7 +172,7 @@ def update_proxy():
         port = proxy['port']
         print(host)
         print(port)
-
+        limit +=1
         session = generate_proxy_session('test', 'test', host, port)
         if not models.AllProxy.objects.filter(ip=host, port=port).exists():
             if check_facebook_url(session):
@@ -198,6 +198,10 @@ def update_proxy():
                                                    checking=0
 
                                                    ))
+        if limit >= 20:
+            models.AllProxy.objects.bulk_create(proxies, batch_size=200, ignore_conflicts=True)
+            limit = 0
+            proxies = []
 
 
 def check_proxy_available_for_facebook(session):
