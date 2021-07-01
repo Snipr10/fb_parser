@@ -223,6 +223,9 @@ def check_proxy_available_for_facebook(session):
             account.banned = True
             account.save()
             return check_proxy_available_for_facebook(session)
+        if 'checkpoint' in start_page:
+            account.available = False
+            account.save()
         if 'checkpoint' not in start_page.url and '/login/device-based/regulr/' not in start_page.url:
             print(str(account.id) + " ok")
             return True
