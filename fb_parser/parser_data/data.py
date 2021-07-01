@@ -318,7 +318,7 @@ def parallel_parse_post(post):
     except Exception as e:
         logger.error(e)
         pass
-    post.taken = 0
+    post.taken = -1
     post.save()
     proxy_last_used(proxy)
 
