@@ -109,8 +109,8 @@ def start_first_update_posts():
         try:
             if post is not None:
                 # todo get proxy
-                parallel_parse_post(post)
-                # pool_source.submit(parallel_parse_post, post)
+                # parallel_parse_post(post)
+                pool_source.submit(parallel_parse_post, post)
         except Exception as e:
             logger.error(e)
             print(e)
