@@ -178,6 +178,7 @@ def update_proxy():
             if check_facebook_url(session):
                 if port == '8080':
                     if check_proxy_available_for_facebook(session):
+                        print('ad 8080 ' + str(host))
                         proxies.append(models.AllProxy(ip=host, port=port, login="test", proxy_password="test",
                                                        last_used=timezone.now(),
                                                        failed=0, errors=0, foregin=0, banned_fb=0, banned_y=0,
