@@ -27,11 +27,11 @@ app.conf.beat_schedule = {
     # #     'task': 'fb_parser.tasks.add_work_credential',
     # #     'schedule': crontab(minute='*/1')
     # # },
-    # 'update_proxy': {
-    #     # 'task': 'fb_parser.tasks.add_proxy',
-    #     'task': 'fb_parser.tasks.update_proxy',
-    #     'schedule': crontab(minute='*/4')
-    # },
+    'update_proxy': {
+        # 'task': 'fb_parser.tasks.add_proxy',
+        'task': 'fb_parser.tasks.update_proxy',
+        'schedule': crontab(minute='*/4')
+    },
     #
     # 'check_not_available_accounts': {
     #     'task': 'fb_parser.tasks.check_not_available_accounts',
