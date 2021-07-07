@@ -141,6 +141,8 @@ def add_proxy():
         timeout=60)
 
     proxies = []
+    print("new_proxy.text")
+    print(new_proxy.text)
     for proxy in json.loads(new_proxy.text):
         ip = proxy['ip']
         port = proxy['port']
