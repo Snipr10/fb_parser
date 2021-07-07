@@ -17,11 +17,15 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'start_first_update_posts': {
         'task': 'fb_parser.tasks.start_first_update_posts',
-        'schedule': crontab(minute='*/10')
+        # 'schedule': crontab(minute='*/10')
+        'schedule': crontab(minute='*/37')
+
     },
     'start_parsing_by_keyword': {
         'task': 'fb_parser.tasks.start_parsing_by_keyword',
-        'schedule': crontab(minute='*/5')
+        # 'schedule': crontab(minute='*/5')
+        'schedule': crontab(minute='*/47')
+
     },
     # 'add_work_credential': {
     #     'task': 'fb_parser.tasks.add_work_credential',
@@ -30,12 +34,16 @@ app.conf.beat_schedule = {
     'update_proxy': {
         # 'task': 'fb_parser.tasks.add_proxy',
         'task': 'fb_parser.tasks.update_proxy',
-        'schedule': crontab(minute='*/4')
+        # 'schedule': crontab(minute='*/4')
+        'schedule': crontab(minute='*/29')
+
     },
 
     'check_not_available_accounts': {
         'task': 'fb_parser.tasks.check_not_available_accounts',
         'schedule': crontab(
-            minute='*/5')
-    },
+            minute='*/35')
+        # minute = '*/5')
+
+},
 }
