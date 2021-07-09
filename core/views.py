@@ -32,7 +32,11 @@ def test(request):
             else:
                 username = sp[-1]
             user.screen_name = username
-            user.save()
+            print('username')
+            try:
+                user.save()
+            except Exception as e:
+                print(e)
     except Exception as e:
         print(e)
     return Response("ok")
