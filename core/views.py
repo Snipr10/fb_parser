@@ -22,7 +22,15 @@ from fb_parser.utils.proxy import generate_proxy_session, check_facebook_url
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def test(request):
-    start_first_update_posts()
+    for user in models.User.objects(bdate__isnull=True):
+        href = user.url
+        sp = href.split('/')
+        if href[-1] == '/':
+            username = sp[-2]
+        else:
+            username = sp[-1]
+        user.screen_name = username
+        user.save()
     return Response("ok")
     session = generate_proxy_session('test', 'test', '172.96.154.137', 8080)
     a= check_facebook_url(session)
