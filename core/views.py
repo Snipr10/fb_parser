@@ -22,16 +22,19 @@ from fb_parser.utils.proxy import generate_proxy_session, check_facebook_url
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def test(request):
-
-    for user in models.User.objects.filter(bdate__isnull=True):
-        href = user.url
-        sp = href.split('/')
-        if href[-1] == '/':
-            username = sp[-2]
-        else:
-            username = sp[-1]
-        user.screen_name = username
-        user.save()
+    print("stert")
+    try:
+        for user in models.User.objects.filter(bdate__isnull=True):
+            href = user.url
+            sp = href.split('/')
+            if href[-1] == '/':
+                username = sp[-2]
+            else:
+                username = sp[-1]
+            user.screen_name = username
+            user.save()
+    except Exception as e:
+        print(e)
     return Response("ok")
     session = generate_proxy_session('test', 'test', '172.96.154.137', 8080)
     a= check_facebook_url(session)
