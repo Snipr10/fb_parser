@@ -22,7 +22,8 @@ from fb_parser.utils.proxy import generate_proxy_session, check_facebook_url
 @api_view(["GET"])
 @permission_classes((AllowAny,))
 def test(request):
-    for user in models.User.objects(bdate__isnull=True):
+
+    for user in models.User.objects.filter(bdate__isnull=True):
         href = user.url
         sp = href.split('/')
         if href[-1] == '/':
