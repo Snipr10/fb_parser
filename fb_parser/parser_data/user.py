@@ -19,6 +19,7 @@ def get_update_user(user_id):
         if user.exists():
             return
         else:
+            name = ""
             username, fb_id, href, logo = get_user_data('https://www.facebook.com/profile.php?id=' + user_id)
             if user_id in username:
                 username = user_id
@@ -35,7 +36,7 @@ def get_update_user(user_id):
                 if user.exists():
                     return
             if username is not None or fb_id is not None or href is not None:
-                models.User.objects.create(id=user_id, screen_name=username, url=href, sphinx_id=get_sphinx_id(href),
+                models.User.objects.create(id=user_id, screen_name=username, name=name, url=href, sphinx_id=get_sphinx_id(href),
                                            logo=logo, last_modify=timezone.now())
 
 
