@@ -20,6 +20,15 @@ def get_update_user(user_id):
             return
         else:
             username, fb_id, href, logo = get_user_data('https://www.facebook.com/profile.php?id=' + user_id)
+            if user_id in username:
+                username = user_id
+            else:
+                name = username
+                sp = href.split('/')
+                if href[-1] == '/':
+                    username = sp[-2]
+                else:
+                    username = sp[-1]
             if username is not None:
                 print(username)
                 user = models.User.objects.filter(screen_name=username)
