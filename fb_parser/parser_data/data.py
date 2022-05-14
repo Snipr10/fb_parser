@@ -221,6 +221,7 @@ def search(face_session, account, keyword):
         results = []
 
         for p in face_session.get_posts_by_search("авто"):
+            print(p)
             results.append(p)
             if limit > 5:
                 break
