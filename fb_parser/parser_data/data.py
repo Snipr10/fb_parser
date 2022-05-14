@@ -224,7 +224,7 @@ def search(face_session, account, keyword):
         for p in face_session.get_posts_by_search(keyword.keyword):
             print(p)
             results.append(p)
-            if limit > 5:
+            if limit > 50:
                 break
             limit += 1
 
