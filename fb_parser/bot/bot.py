@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 import requests
@@ -15,7 +16,9 @@ logger = logging.getLogger(__file__)
 
 
 def get_session():
-    account = models.Account.filter(in_progress=False, banned=False, proxy_id__isnull=False).order_by(
+    account = models.Account.objects.filter(in_progress=False, banned=False,
+                                            last_parsing__gte=timezone.now() + datetime.timedelta(minutes=40),
+                                            proxy_id__isnull=False).order_by(
         'last_parsing').first()
     if account is None:
         return None, None
@@ -26,7 +29,7 @@ def get_session():
         account.last_parsing = timezone.now()
         account.save()
         face = FacebookScraper()
-        face.session.cookies.update(cookiejar_from_dict(account.cookie))
+        face.session.cookies.update(cookiejar_from_dict(json.loads(account.cookie)))
         # face.login("100081198725298", "howardsxfloyd271")
         face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
         return face, account
@@ -35,6 +38,7 @@ def get_session():
         account.banned = True
         account.save()
         return None, None
+
 
 def login(session, email, password):
     try:
