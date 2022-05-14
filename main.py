@@ -20,7 +20,7 @@ Task = []
 
 if __name__ == '__main__':
 
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gms_tg.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fb_parser.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
