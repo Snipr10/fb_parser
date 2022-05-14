@@ -29,13 +29,17 @@ def start_parsing_by_keyword():
         status=1)
     if not select_sources.exists():
         return
+    print("key_source")
     key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
     # delete id
+    print("key_word")
+
     key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
                                               id__in=list(key_source.values_list('keyword_id', flat=True))
                                               ).order_by('last_modified').first()
 
     if key_word is not None:
+        print(key_word)
         select_source = select_sources.get(id=key_source.filter(keyword_id=key_word.id).first().source_id)
         last_update = key_word.last_modified
         time = select_source.sources

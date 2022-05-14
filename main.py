@@ -44,8 +44,3 @@ if __name__ == '__main__':
 
     start_parsing_by_keyword()
 
-    a = Account.objects.get(id=321)
-    print(a)
-    print(a.cookie)
-    json.loads(a.cookie)
-    print(json.loads(a.cookie))
