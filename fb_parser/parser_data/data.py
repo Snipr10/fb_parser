@@ -261,8 +261,10 @@ def saver(results):
                                      likes_count=z['likes'],
                                      comments_count=z['comments'],
                                      repost_count=z['shares'],
-                                     url=post_url
-                                     ))
+                                     url=post_url,
+                                     content_hash = get_md5_text(content)
+
+            ))
             user_url = z['user_url'].split("?")[0]
             users.append(models.User(id=user_id, screen_name=z['user_id'], logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url),

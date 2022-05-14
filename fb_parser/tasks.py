@@ -61,6 +61,44 @@ def start_parsing_by_keyword():
 
 
 @app.task
+def start_parsing_by_source():
+    print('start')
+    select_sources = models.Sources.objects.filter(
+        Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
+        status=1)
+    if not select_sources.exists():
+        return
+    print("key_source")
+    key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
+    # delete id
+    print("key_word")
+
+    key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
+                                             id__in=list(key_source.values_list('keyword_id', flat=True))
+                                             ).order_by('last_modified').first()
+
+    if key_word is not None:
+        print(key_word)
+        select_source = select_sources.get(id=key_source.filter(keyword_id=key_word.id).first().source_id)
+        last_update = key_word.last_modified
+        time = select_source.sources
+        print(time)
+
+        if last_update is None or (last_update + datetime.timedelta(minutes=time) <
+                                   update_time_timezone(timezone.localtime())):
+            key_word.taken = 1
+            key_word.save()
+            try:
+                face_session, account = get_session()
+                if face_session:
+                    search(face_session, account, key_word)
+            finally:
+                django.db.close_old_connections()
+                key_word.taken = 0
+                key_word.save()
+
+
+@app.task
 def start_first_update_posts():
     pool_source = ThreadPoolExecutor(15)
     print("start")
