@@ -45,7 +45,9 @@ if __name__ == '__main__':
 
     while True:
         try:
+            print("start_parsing_by_source")
             start_parsing_by_source()
+            print("start_parsing_by_keyword")
             start_parsing_by_keyword()
             Account.objects.all().update(taken=0)
         except Exception as e:
