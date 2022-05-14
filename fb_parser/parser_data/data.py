@@ -220,35 +220,37 @@ def search(face_session, account, keyword):
         limit = 0
         results = []
 
-        for p in face_session.get_posts_by_search("авто"):
+        for p in face_session.get_posts_by_search(keyword.keyword):
             print(p)
             results.append(p)
-            if limit > 5:
+            if limit > 50:
                 break
             limit += 1
         post_content = []
         users = []
         posts = []
         for z in results:
-            post_id = z['post_id']
-            content = z['post_text']
-            user_id = z['user_id']
-            post_url = z['post_url']
+            try:
+                post_id = z['post_id']
+                content = z['post_text']
+                user_id = z['user_id']
+                post_url = z['post_url']
 
-            post_content.append(models.PostContent(post_id=post_id, content=content))
-            posts.append(models.Post(id=post_id, user_id=user_id, group_id=z['page_id'],
-                                     created_date=z['time'],
-                                     sphinx_id=get_sphinx_id(post_url),
-                                     likes_count=z['likes'],
-                                     comments_count=z['comments'],
-                                     repost_count=z['shares'],
-                                     url=post_url
-                                     ))
-            user_url = z['user_url'].split("?")[0]
-            users.append(models.User(id=user_id, screen_name=z['user_id'], logo="", url=user_url,
-                                     sphinx_id=get_sphinx_id(user_url),
-                                     name=z['username']))
-
+                post_content.append(models.PostContent(post_id=post_id, content=content))
+                posts.append(models.Post(id=post_id, user_id=user_id, group_id=z['page_id'],
+                                         created_date=z['time'],
+                                         sphinx_id=get_sphinx_id(post_url),
+                                         likes_count=z['likes'],
+                                         comments_count=z['comments'],
+                                         repost_count=z['shares'],
+                                         url=post_url
+                                         ))
+                user_url = z['user_url'].split("?")[0]
+                users.append(models.User(id=user_id, screen_name=z['user_id'], logo="", url=user_url,
+                                         sphinx_id=get_sphinx_id(user_url),
+                                         name=z['username']))
+            except Exception as e:
+                print(e)
         # try:
         #     models.User.objects.bulk_update(users, ['updated', ], batch_size=batch_size)
         # except Exception as e:
