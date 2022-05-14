@@ -215,6 +215,33 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
     return result
 
 
+def search_source(face_session, account, source, retro):
+    print("start  search source")
+    try:
+        print("start  search")
+        limit = 0
+        results = []
+
+        for p in face_session.get_posts(source.data):
+            print(p)
+            results.append(p)
+            if limit > 50 or p['time'] < retro:
+                break
+            limit += 1
+
+        saver(results)
+        django.db.close_old_connections()
+        source.taken = 0
+        source.last_modified = update_time_timezone(timezone.localtime())
+        source.save()
+        account.last_parsing = update_time_timezone(timezone.localtime())
+        account.taken = 0
+        account.save()
+    except Exception as e:
+        print(e)
+    return True
+
+
 def search(face_session, account, keyword):
     try:
         print("start  search")
@@ -253,9 +280,9 @@ def saver(results):
             content = z['post_text']
             user_id = z['user_id']
             post_url = z['post_url']
-
+            group_id = z['page_id'] if z['page_id'] else user_id
             post_content.append(models.PostContent(post_id=post_id, content=content))
-            posts.append(models.Post(id=post_id, user_id=user_id, group_id=z['page_id'],
+            posts.append(models.Post(id=post_id, user_id=user_id, group_id=group_id,
                                      created_date=z['time'],
                                      sphinx_id=get_sphinx_id(post_url),
                                      likes_count=z['likes'],

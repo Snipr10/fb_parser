@@ -7,7 +7,7 @@ import pyquery
 
 from core import models
 from django.utils import timezone
-from fb_parser.utils.find_data import find_value
+from fb_parser.utils.find_data import find_value, update_time_timezone
 from fb_parser.utils.proxy import get_proxy_str, proxy_last_used, get_proxy
 from facebook_scraper import FacebookScraper
 from requests.cookies import cookiejar_from_dict
@@ -28,8 +28,8 @@ def get_session():
     try:
         # proxy = models.AllProxy.objects.get(id=account.proxy_id)
         account.taken = True
-        account.start_parsing = timezone.now()
-        account.last_parsing = timezone.now()
+        account.start_parsing = update_time_timezone(timezone.now())
+        account.last_parsing = update_time_timezone(timezone.now())
         account.save()
         face = FacebookScraper()
         face.session.cookies.update(cookiejar_from_dict(json.loads(account.cookie)))

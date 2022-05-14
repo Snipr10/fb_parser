@@ -14,7 +14,7 @@ from core import models
 from core.models import WorkCred
 from fb_parser.bot.bot import get_session, check_accounts
 from fb_parser.celery.celery import app
-from fb_parser.parser_data.data import search, parallel_parse_post
+from fb_parser.parser_data.data import search, parallel_parse_post, search_source
 from fb_parser.settings import network_id, BEST_PROXY_KEY
 from fb_parser.utils.find_data import update_time_timezone
 from fb_parser.utils.proxy import generate_proxy_session, check_facebook_url
@@ -68,34 +68,32 @@ def start_parsing_by_source():
         status=1)
     if not select_sources.exists():
         return
-    print("key_source")
-    key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
-    # delete id
-    print("key_word")
+    sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
+                                                      last_modified__isnull=False,
+                                                      source_id__in=list(select_sources.values_list('id', flat=True))
+                                                      ).order_by('last_modified').first()
 
-    key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
-                                             id__in=list(key_source.values_list('keyword_id', flat=True))
-                                             ).order_by('last_modified').first()
+    if sources_item is not None:
+        print(sources_item)
+        retro = select_sources.get(id=sources_item.source_id).retro
 
-    if key_word is not None:
-        print(key_word)
-        select_source = select_sources.get(id=key_source.filter(keyword_id=key_word.id).first().source_id)
-        last_update = key_word.last_modified
-        time = select_source.sources
-        print(time)
+        retro_date = datetime.datetime(retro.year, retro.month, retro.day)
+        last_modified = sources_item.last_modified
 
-        if last_update is None or (last_update + datetime.timedelta(minutes=time) <
-                                   update_time_timezone(timezone.localtime())):
-            key_word.taken = 1
-            key_word.save()
+        last_modified = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
+                                          last_modified.hour, last_modified.minute, last_modified.second)
+        if retro_date < last_modified:
+            retro_date = last_modified
+            sources_item.taken = 1
+            sources_item.save()
             try:
                 face_session, account = get_session()
                 if face_session:
-                    search(face_session, account, key_word)
+                    search_source(face_session, account, sources_item, retro_date)
             finally:
                 django.db.close_old_connections()
-                key_word.taken = 0
-                key_word.save()
+                sources_item.taken = 0
+                sources_item.save()
 
 
 @app.task
