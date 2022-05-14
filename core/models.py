@@ -21,6 +21,7 @@ class Post(models.Model):
     last_modified = models.DateTimeField(default=datetime(1, 1, 1, 0, 0))
     content_hash = models.CharField(max_length=32, null=True, blank=True)
     taken = models.IntegerField(default=0)
+    url = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = 'prsr_parser_fb_posts'
@@ -218,6 +219,11 @@ class Account(models.Model):
     available = models.BooleanField(default=True)
     availability_check = models.DateTimeField(null=True, blank=True)
     banned = models.BooleanField(default=False)
+    taken = models.BooleanField(default=False)
+    cookie = models.CharField(default='', max_length=200)
+    proxy_id = models.CharField(max_length=256)
+    start_parsing = models.DateTimeField(null=True, blank=True)
+    last_parsing = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'prsr_parser_fb_account'

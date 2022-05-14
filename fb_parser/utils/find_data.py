@@ -31,5 +31,5 @@ def update_time_timezone(my_time):
 
 def get_sphinx_id(url):
     m = hashlib.md5()
-    m.update(('https://t.me/{}'.format(url)).encode())
+    m.update(url.encode())
     return int(str(int(m.hexdigest(), 16))[:16])

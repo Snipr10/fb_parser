@@ -8,64 +8,33 @@ from core import models
 from django.utils import timezone
 from fb_parser.utils.find_data import find_value
 from fb_parser.utils.proxy import get_proxy_str, proxy_last_used, get_proxy
+from facebook_scraper import FacebookScraper
+from requests.cookies import cookiejar_from_dict
 
 logger = logging.getLogger(__file__)
 
 
 def get_session():
-    # todo is bots?
-    # return None, None, None, None
-    # proxy
-    work_credit = models.WorkCred.objects.filter(in_progress=False, locked=False).order_by('last_parsing').first()
-    if work_credit is None:
-        return None, None, None, None, None, None, None
-    # email = "79663803199"
-    # password = "xEQpdFKGtFKGo26198"
-    work_credit.in_progress = True
-    work_credit.start_parsing = timezone.now()
-    work_credit.last_parsing = timezone.now()
-
-    work_credit.save()
+    account = models.Account.filter(in_progress=False, banned=False, proxy_id__isnull=False).order_by(
+        'last_parsing').first()
+    if account is None:
+        return None, None
     try:
-        account = models.Account.objects.get(id=work_credit.account_id)
-    except Exception as e:
-        logger.error(e)
-        print(e)
-        work_credit.delete()
-        return get_session()
-    try:
-        proxy = models.AllProxy.objects.get(id=work_credit.proxy_id)
-    except Exception as e:
-        logger.error(e)
-
-        print(e)
-        work_credit.delete()
-        return get_session()
-    print('session')
-    session = requests.session()
-    session.proxies.update(get_proxy_str(proxy))
-    session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:39.0) Gecko/20100101 Firefox/39.0'
-    })
-    print('session start')
-
-    fb_dtsg, user_id, xs, token = login(session, account.login, account.password)
-    if fb_dtsg is not None and token is not None:
-        account.availability_check = datetime.datetime.now()
+        # proxy = models.AllProxy.objects.get(id=account.proxy_id)
+        account.taken = True
+        account.start_parsing = timezone.now()
+        account.last_parsing = timezone.now()
         account.save()
-        proxy_last_used(proxy)
-        print('session ok')
-
-        return work_credit, proxy, session, fb_dtsg, user_id, xs, token
-    elif user_id is not None and xs is not None:
+        face = FacebookScraper()
+        face.session.cookies.update(cookiejar_from_dict(account.cookie))
+        # face.login("100081198725298", "howardsxfloyd271")
+        face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
+        return face, account
+    except Exception as e:
+        print(e)
         account.banned = True
         account.save()
-    else:
-        proxy.banned_fb = True
-        proxy.save()
-    work_credit.delete()
-    return get_session()
-
+        return None, None
 
 def login(session, email, password):
     try:

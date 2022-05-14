@@ -213,41 +213,49 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
     return result
 
 
-def search(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[], result=[],
-           limit=0):
-    print("start search search")
-    result = search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key_word, cursor=None, urls=[],
-                            result=[], limit=0)
-    posts = []
+def search(face_session, account, keyword):
+    try:
+        print("start search search")
+        limit = 100
+        results = []
 
-    for res in result:
-        data_url = res.split('&')
-        try:
-            print('id')
-            print(int(data_url[0]))
-            print('group_id')
-            print(int(data_url[1]))
-            posts.append(models.Post(id=int(data_url[0]),
-                                     group_id=int(data_url[1])))
-        except Exception as e:
-            logger.error(e)
-            print(e)
-    print("save post")
-    for post in posts:
-        try:
-            print("try save post")
-            models.Post.objects.bulk_create([post], batch_size=BATCH_SIZE)
-        except Exception as e:
-            print("SAVE"  + str(e))
-    models.Post.objects.bulk_create(posts, batch_size=BATCH_SIZE, ignore_conflicts=True)
-    key_word.taken = 0
-    key_word.save()
-    work_credit.last_parsing = datetime.datetime.now()
-    work_credit.in_progress = False
-    work_credit.save()
-    proxy.last_used = datetime.datetime.now()
-    proxy.save()
-    return result
+        for p in face_session.get_posts_by_search("авто"):
+            results.append(p)
+            if limit > 100:
+                break
+            limit += 1
+        post_content = []
+        users = []
+        posts = []
+        for z in results:
+            post_id = z['post_id']
+            content = z['post_text']
+            user_id = z['user_id']
+            post_url = z['post_url']
+
+            post_content.append(models.PostContent(post_id=post_id, content=content))
+            posts.append(models.Post(id=post_id, user_id=user_id, group_id=z['page_id'],
+                                     created_date=z['time'],
+                                     sphinx_id=get_sphinx_id(post_url),
+                                     likes_count=z['likes'],
+                                     comments_count=z['comments'],
+                                     repost_count=z['shares'],
+                                     url=post_url
+                                     ))
+            user_url = z['user_url'].split("?")[0]
+            users.append(models.User(id=user_id, screen_name=z['user_id'], logo="", url=user_url,
+                                     sphinx_id=get_sphinx_id(user_url),
+                                     name=z['username']))
+
+        keyword.taken = 0
+        keyword.last_modified = update_time_timezone(timezone.localtime())
+        keyword.save()
+        account.last_parsing = update_time_timezone(timezone.localtime())
+        account.taken = 0
+        account.save()
+    except Exception as e:
+        print(e)
+    return True
 
 
 def get_data_from_url(post, proxy):
