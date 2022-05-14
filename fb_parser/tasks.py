@@ -75,17 +75,24 @@ def start_parsing_by_source():
 
     if sources_item is not None:
         print(sources_item)
-        retro = select_sources.get(id=sources_item.source_id).retro
+        select_source = select_sources.get(id=sources_item.source_id)
+        retro = select_source.retro
 
         retro_date = datetime.datetime(retro.year, retro.month, retro.day)
         last_modified = sources_item.last_modified
+        try:
+            last_modified = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
+                                              last_modified.hour, last_modified.minute, last_modified.second)
+            if retro_date < last_modified:
+                retro_date = last_modified
+        except Exception:
+            pass
+        sources_item.taken = 1
+        sources_item.save()
+        time = select_source.sources
 
-        last_modified = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
-                                          last_modified.hour, last_modified.minute, last_modified.second)
-        if retro_date < last_modified:
-            retro_date = last_modified
-            sources_item.taken = 1
-            sources_item.save()
+        if last_modified is None or (last_modified + datetime.timedelta(minutes=time) <
+                                     update_time_timezone(timezone.localtime())):
             try:
                 face_session, account = get_session()
                 if face_session:
