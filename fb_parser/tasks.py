@@ -81,10 +81,10 @@ def start_parsing_by_source():
         retro_date = datetime.datetime(retro.year, retro.month, retro.day)
         last_modified = sources_item.last_modified
         try:
-            last_modified = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
+            last_modified_up = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
                                               last_modified.hour, last_modified.minute, last_modified.second)
-            if retro_date < last_modified:
-                retro_date = last_modified
+            if retro_date < last_modified_up:
+                retro_date = last_modified_up
         except Exception:
             pass
         sources_item.taken = 1
