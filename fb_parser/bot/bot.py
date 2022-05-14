@@ -17,6 +17,7 @@ logger = logging.getLogger(__file__)
 
 def get_session():
     print("get_session")
+    print(timezone.now() + datetime.timedelta(minutes=40))
     account = models.Account.objects.filter(taken=False, banned=False,
                                             last_parsing__lte=timezone.now() + datetime.timedelta(minutes=40),
                                             proxy_id__isnull=False).order_by(
