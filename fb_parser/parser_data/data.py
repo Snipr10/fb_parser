@@ -20,6 +20,7 @@ from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used, sto
 
 logger = logging.getLogger(__file__)
 
+batch_size = 200
 
 def get_class_text(soup, class_name):
     try:
@@ -246,6 +247,23 @@ def search(face_session, account, keyword):
             users.append(models.User(id=user_id, screen_name=z['user_id'], logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url),
                                      name=z['username']))
+
+        # try:
+        #     models.User.objects.bulk_update(users, ['updated', ], batch_size=batch_size)
+        # except Exception as e:
+        #     print(e)
+        try:
+            models.User.objects.bulk_create(users, batch_size=batch_size, ignore_conflicts=True)
+        except Exception as e:
+            print(e)
+        try:
+            models.Post.objects.bulk_create(posts, batch_size=batch_size, ignore_conflicts=True)
+        except Exception as e:
+            print(e)
+        try:
+            models.PostContent.objects.bulk_create(post_content, batch_size=batch_size, ignore_conflicts=True)
+        except Exception as e:
+            print(e)
 
         keyword.taken = 0
         keyword.last_modified = update_time_timezone(timezone.localtime())
