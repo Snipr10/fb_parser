@@ -217,14 +217,16 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
 
 def search_source(face_session, account, source, retro):
     print("start  search source")
+    print(retro)
+
     try:
-        print("start  search")
         limit = 0
         results = []
 
         for p in face_session.get_posts(source.data):
-            print(p)
+            # print(p)
             results.append(p)
+            print( p['time'])
             if limit > 50 or p['time'] < retro:
                 break
             limit += 1
