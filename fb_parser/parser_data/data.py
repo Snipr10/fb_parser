@@ -216,12 +216,12 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
 def search(face_session, account, keyword):
     try:
         print("start search search")
-        limit = 100
+        limit = 0
         results = []
 
         for p in face_session.get_posts_by_search("авто"):
             results.append(p)
-            if limit > 100:
+            if limit > 5:
                 break
             limit += 1
         post_content = []
