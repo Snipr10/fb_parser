@@ -14,6 +14,7 @@ import os
 
 from django.db.models import Q, F
 
+
 BOT = None
 
 Task = []
@@ -39,6 +40,9 @@ if __name__ == '__main__':
     # x = threading.Thread(target=update_, args=(0,))
     # x.start()
     from core.models import Account
+    from fb_parser.tasks import start_parsing_by_keyword
+
+    start_parsing_by_keyword()
 
     a = Account.objects.get(id=321)
     print(a)
