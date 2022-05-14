@@ -23,8 +23,8 @@ app.conf.beat_schedule = {
     # },
     'start_parsing_by_keyword': {
         'task': 'fb_parser.tasks.start_parsing_by_keyword',
-        # 'schedule': crontab(minute='*/5')
-        'schedule': crontab(minute='*/47')
+        'schedule': crontab(minute='*/5')
+        # 'schedule': crontab(minute='*/47')
 
     },
     # 'add_work_credential': {

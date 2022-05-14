@@ -42,8 +42,11 @@ if __name__ == '__main__':
     # x.start()
     from core.models import Account
     from fb_parser.tasks import start_parsing_by_keyword
-    start_parsing_by_keyword()
-
+    while True:
+        try:
+            start_parsing_by_keyword()
+        except Exception as e:
+            print(e)
     a = Account.objects.get(id=321)
     # print(a)
     # print(a.cookie)

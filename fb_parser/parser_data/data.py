@@ -6,6 +6,7 @@ import dateutil.parser
 import json
 import re
 
+import django.db
 import requests
 from bs4 import BeautifulSoup
 from django.utils import timezone
@@ -223,51 +224,12 @@ def search(face_session, account, keyword):
         for p in face_session.get_posts_by_search(keyword.keyword):
             print(p)
             results.append(p)
-            if limit > 50:
+            if limit > 5:
                 break
             limit += 1
-        post_content = []
-        users = []
-        posts = []
-        for z in results:
-            try:
-                post_id = z['post_id']
-                content = z['post_text']
-                user_id = z['user_id']
-                post_url = z['post_url']
 
-                post_content.append(models.PostContent(post_id=post_id, content=content))
-                posts.append(models.Post(id=post_id, user_id=user_id, group_id=z['page_id'],
-                                         created_date=z['time'],
-                                         sphinx_id=get_sphinx_id(post_url),
-                                         likes_count=z['likes'],
-                                         comments_count=z['comments'],
-                                         repost_count=z['shares'],
-                                         url=post_url
-                                         ))
-                user_url = z['user_url'].split("?")[0]
-                users.append(models.User(id=user_id, screen_name=z['user_id'], logo="", url=user_url,
-                                         sphinx_id=get_sphinx_id(user_url),
-                                         name=z['username']))
-            except Exception as e:
-                print(e)
-        # try:
-        #     models.User.objects.bulk_update(users, ['updated', ], batch_size=batch_size)
-        # except Exception as e:
-        #     print(e)
-        try:
-            models.User.objects.bulk_create(users, batch_size=batch_size, ignore_conflicts=True)
-        except Exception as e:
-            print(e)
-        try:
-            models.Post.objects.bulk_create(posts, batch_size=batch_size, ignore_conflicts=True)
-        except Exception as e:
-            print(e)
-        try:
-            models.PostContent.objects.bulk_create(post_content, batch_size=batch_size, ignore_conflicts=True)
-        except Exception as e:
-            print(e)
-
+        saver(results)
+        django.db.close_old_connections()
         keyword.taken = 0
         keyword.last_modified = update_time_timezone(timezone.localtime())
         keyword.save()
@@ -278,6 +240,51 @@ def search(face_session, account, keyword):
         print(e)
     return True
 
+
+def saver(results):
+    post_content = []
+    users = []
+    posts = []
+    django.db.close_old_connections()
+
+    for z in results:
+        try:
+            post_id = z['post_id']
+            content = z['post_text']
+            user_id = z['user_id']
+            post_url = z['post_url']
+
+            post_content.append(models.PostContent(post_id=post_id, content=content))
+            posts.append(models.Post(id=post_id, user_id=user_id, group_id=z['page_id'],
+                                     created_date=z['time'],
+                                     sphinx_id=get_sphinx_id(post_url),
+                                     likes_count=z['likes'],
+                                     comments_count=z['comments'],
+                                     repost_count=z['shares'],
+                                     url=post_url
+                                     ))
+            user_url = z['user_url'].split("?")[0]
+            users.append(models.User(id=user_id, screen_name=z['user_id'], logo="", url=user_url,
+                                     sphinx_id=get_sphinx_id(user_url),
+                                     name=z['username']))
+        except Exception as e:
+            print(e)
+    # try:
+    #     models.User.objects.bulk_update(users, ['updated', ], batch_size=batch_size)
+    # except Exception as e:
+    #     print(e)
+    try:
+        models.User.objects.bulk_create(users, batch_size=batch_size, ignore_conflicts=True)
+    except Exception as e:
+        print(e)
+    try:
+        models.Post.objects.bulk_create(posts, batch_size=batch_size, ignore_conflicts=True)
+    except Exception as e:
+        print(e)
+    try:
+        models.PostContent.objects.bulk_create(post_content, batch_size=batch_size, ignore_conflicts=True)
+    except Exception as e:
+        print(e)
 
 def get_data_from_url(post, proxy):
     url = 'https://m.facebook.com/story.php?story_fbid=%s&id=%s' % (post.id, post.group_id)
