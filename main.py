@@ -42,20 +42,20 @@ if __name__ == '__main__':
     # x.start()
     from core.models import Account
     from fb_parser.tasks import start_parsing_by_keyword
+    start_parsing_by_keyword()
 
     a = Account.objects.get(id=321)
-    print(a)
-    print(a.cookie)
-    json.loads(a.cookie)
-    print(json.loads(a.cookie))
-    face = FacebookScraper()
-    face.session.cookies.update(cookiejar_from_dict(json.loads(a.cookie)))
-    # face.login("100081198725298", "howardsxfloyd271")
-    face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
-    for z in face.get_posts_by_search("авто"):
-        print(z)
+    # print(a)
+    # print(a.cookie)
+    # json.loads(a.cookie)
+    # print(json.loads(a.cookie))
+    # face = FacebookScraper()
+    # face.session.cookies.update(cookiejar_from_dict(json.loads(a.cookie)))
+    # # face.login("100081198725298", "howardsxfloyd271")
+    # face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
+    # for z in face.get_posts_by_search("авто"):
+    #     print(z)
 
-    start_parsing_by_keyword()
 
     a = Account.objects.get(id=321)
     print(a)
