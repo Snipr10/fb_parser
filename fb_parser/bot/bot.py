@@ -16,10 +16,13 @@ logger = logging.getLogger(__file__)
 
 
 def get_session():
+    print("get_session")
     account = models.Account.objects.filter(taken=False, banned=False,
                                             last_parsing__gte=timezone.now() + datetime.timedelta(minutes=40),
                                             proxy_id__isnull=False).order_by(
         'last_parsing').first()
+    print(account)
+
     if account is None:
         return None, None
     try:
