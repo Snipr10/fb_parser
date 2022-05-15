@@ -249,7 +249,7 @@ def search(face_session, account, keyword):
         print("start  search")
         limit = 0
         results = []
-
+        print(keyword.keyword)
         for p in face_session.get_posts_by_search(keyword.keyword):
             print(p)
             results.append(p)
