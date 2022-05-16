@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
         except Exception as e:
             print(e)
-        time.sleep(5*60)
+        # time.sleep(5*60)
     # a = Account.objects.get(id=321)
     # print(a)
     # print(a.cookie)
