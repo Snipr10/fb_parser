@@ -227,6 +227,8 @@ def search_source(face_session, account, source, retro):
             # print(p)
             results.append(p)
             print(p['time'])
+            print(p['text'][:10])
+
             # if limit > 150 or p['time'] < retro:
             if limit > 150:
                 break
@@ -252,7 +254,8 @@ def search(face_session, account, keyword):
         results = []
         print(keyword.keyword)
         for p in face_session.get_posts_by_search(keyword.keyword):
-            print(p)
+            print(p['time'])
+            print(p['text'][:10])
             results.append(p)
             if limit > 250:
                 break
