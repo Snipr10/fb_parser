@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import time
 from datetime import timedelta
 import random
 
@@ -54,6 +55,8 @@ def start_parsing_by_keyword():
                 face_session, account = get_session()
                 if face_session:
                     search(face_session, account, key_word)
+                else:
+                    time.sleep(5 * 60)
             finally:
                 django.db.close_old_connections()
                 key_word.taken = 0
@@ -89,14 +92,16 @@ def start_parsing_by_source():
             pass
         sources_item.taken = 1
         sources_item.save()
-        time = select_source.sources
+        time_ = select_source.sources
 
-        if last_modified is None or (last_modified + datetime.timedelta(minutes=time) <
+        if last_modified is None or (last_modified + datetime.timedelta(minutes=time_) <
                                      update_time_timezone(timezone.localtime())):
             try:
                 face_session, account = get_session()
                 if face_session:
                     search_source(face_session, account, sources_item, retro_date)
+                else:
+                    time.sleep(5*60)
             finally:
                 django.db.close_old_connections()
                 sources_item.taken = 0

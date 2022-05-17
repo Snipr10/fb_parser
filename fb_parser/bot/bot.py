@@ -17,9 +17,8 @@ logger = logging.getLogger(__file__)
 
 def get_session():
     print("get_session")
-    print(timezone.now() + datetime.timedelta(minutes=40))
     account = models.Account.objects.filter(taken=False, banned=False,
-                                            last_parsing__lte=update_time_timezone(timezone.now() - datetime.timedelta(minutes=30)),
+                                            last_parsing__lte=update_time_timezone(timezone.now() - datetime.timedelta(minutes=20)),
                                             proxy_id__isnull=False).order_by(
         'last_parsing').first()
     print(account)
