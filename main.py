@@ -49,9 +49,7 @@ if __name__ == '__main__':
             start_parsing_by_source()
             print("start_parsing_by_keyword")
             start_parsing_by_keyword()
-            Account.objects.all().update(taken=0)
             django.db.close_old_connections()
-
         except Exception as e:
             print(e)
         # time.sleep(5*60)

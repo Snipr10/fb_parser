@@ -32,10 +32,13 @@ def get_session():
         account.start_parsing = update_time_timezone(timezone.now())
         account.last_parsing = update_time_timezone(timezone.now())
         account.save()
+        proxy = models.AllProxy.objects.get(id=account.proxy_id)
         face = FacebookScraper()
         face.session.cookies.update(cookiejar_from_dict(json.loads(account.cookie)))
         # face.login("100081198725298", "howardsxfloyd271")
-        face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
+        face.set_proxy('http://{}:{}@{}:{}'.format(proxy.login, proxy.proxy_password, proxy.ip, proxy.port))
+
+        # face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
         return face, account
     except Exception as e:
         print(e)
