@@ -243,6 +243,10 @@ def search_source(face_session, account, source, retro):
         account.taken = 0
         account.save()
     except Exception as e:
+        account.last_parsing = update_time_timezone(timezone.localtime())
+        account.error = str(e)
+        account.taken = 0
+        account.save()
         print(e)
     return True
 
@@ -270,6 +274,10 @@ def search(face_session, account, keyword):
         account.taken = 0
         account.save()
     except Exception as e:
+        account.last_parsing = update_time_timezone(timezone.localtime())
+        account.error = str(e)
+        account.taken = 0
+        account.save()
         print(e)
     return True
 

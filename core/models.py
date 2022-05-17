@@ -224,6 +224,7 @@ class Account(models.Model):
     proxy_id = models.CharField(max_length=256)
     start_parsing = models.DateTimeField(null=True, blank=True)
     last_parsing = models.DateTimeField(null=True, blank=True)
+    error = models.CharField(default='', max_length=1000)
 
     class Meta:
         db_table = 'prsr_parser_fb_account'
