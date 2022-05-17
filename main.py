@@ -26,8 +26,16 @@ def new_process_key(i):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
-        x = multiprocessing.Process(target=start_parsing_by_keyword, args=())
+        x = multiprocessing.Process(target=start_parsing_by_keyword_while, args=())
         x.start()
+
+
+def start_parsing_by_keyword_while():
+    while True:
+        try:
+            start_parsing_by_keyword()
+        except Exception as e:
+            print(e)
 
 
 def new_process_source(i):
@@ -35,8 +43,16 @@ def new_process_source(i):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
-        x = multiprocessing.Process(target=start_parsing_by_source, args=())
+        x = multiprocessing.Process(target=start_parsing_by_source_while, args=())
         x.start()
+
+
+def start_parsing_by_source_while():
+    while True:
+        try:
+            start_parsing_by_source()
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
