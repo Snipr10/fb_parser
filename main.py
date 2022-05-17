@@ -36,6 +36,7 @@ def start_parsing_by_keyword_while():
             start_parsing_by_keyword()
         except Exception as e:
             print(e)
+            time.sleep(5 * 60)
 
 
 def new_process_source(i):
@@ -53,6 +54,7 @@ def start_parsing_by_source_while():
             start_parsing_by_source()
         except Exception as e:
             print(e)
+            time.sleep(5 * 60)
 
 
 if __name__ == '__main__':
