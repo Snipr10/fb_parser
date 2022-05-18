@@ -22,7 +22,7 @@ Task = []
 
 
 def new_process_key(i):
-    for i in range(5):
+    for i in range(3):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
@@ -40,7 +40,7 @@ def start_parsing_by_keyword_while():
 
 
 def new_process_source(i):
-    for i in range(5):
+    for i in range(3):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
