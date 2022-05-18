@@ -350,7 +350,6 @@ def parallel_parse_post(post):
     if proxy is None:
         post_taken(post)
         return
-    print("start")
 
     try:
 
