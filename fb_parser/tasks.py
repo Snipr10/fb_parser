@@ -25,6 +25,8 @@ logger = logging.getLogger(__file__)
 
 @app.task
 def start_parsing_by_keyword():
+    django.db.close_old_connections()
+
     select_sources = models.Sources.objects.filter(
         Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
         status=1)
@@ -65,6 +67,8 @@ def start_parsing_by_keyword():
 
 @app.task
 def start_parsing_by_source():
+    django.db.close_old_connections()
+
     select_sources = models.Sources.objects.filter(
         Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
         status=1)
