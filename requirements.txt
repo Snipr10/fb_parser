@@ -177,7 +177,6 @@ pytest==6.2.5
 python-apt==2.0.0+ubuntu0.20.4.7
 python-dateutil==2.8.2
 python-debian===0.1.36ubuntu1
-python-docx @ git+git://github.com/KehaoWu/python-docx.git@8821651796628f576b98f47662adabb16da7c9fa
 python-dotenv==0.15.0
 python-pptx==0.6.18
 python-slugify==3.0.2
