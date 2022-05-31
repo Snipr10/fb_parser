@@ -197,10 +197,6 @@ sortedcontainers==2.4.0
 soupsieve==2.2.1
 sqlparse==0.4.1
 starlette==0.14.2
-systemd-python==234
-telebot==0.0.4
-Telethon==1.24.0
-text-unidecode==1.2
 texttable==1.6.2
 tinysegmenter==0.3
 tldextract==3.1.2
