@@ -31,7 +31,6 @@ configparser==3.8.1
 crayons==0.4.0
 cryptography==2.9.2
 cssselect==1.1.0
-cupshelpers==1.0
 dacite==1.6.0
 dateparser==1.0.0
 dbus-python==1.2.16
