@@ -95,7 +95,6 @@ keyboa==3.1.0
 keyring==18.0.1
 kombu==5.1.0
 labml==0.4.125
-language-selector==0.1
 launchpadlib==1.10.13
 lazr.restfulclient==0.14.2
 lazr.uri==1.0.3
