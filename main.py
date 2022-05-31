@@ -1,20 +1,14 @@
-import json
 import multiprocessing
 import random
 import time
 
-from concurrent.futures.thread import ThreadPoolExecutor
 import threading
-import concurrent
 
-import telebot
 from django.utils import timezone
 
 import os
 
-from django.db.models import Q, F
-from facebook_scraper import FacebookScraper
-from requests.cookies import cookiejar_from_dict
+from django.db.models import Q
 
 BOT = None
 
