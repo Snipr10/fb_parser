@@ -77,8 +77,11 @@ if __name__ == '__main__':
     #
     # x = threading.Thread(target=update_, args=(0,))
     # x.start()
-    from core.models import Account
+    from core.models import Account, Keyword, Sources
     from fb_parser.tasks import start_parsing_by_keyword, start_parsing_by_source
+    from fb_parser.utils.find_data import update_time_timezone
+    import datetime
+    from fb_parser.settings import network_id
 
     for i in range(2):
         time.sleep(10)
@@ -91,26 +94,33 @@ if __name__ == '__main__':
         x = threading.Thread(target=new_process_source, args=(i,))
         x.start()
 
-    # while True:
-    #     try:
-    #         print("start_parsing_by_source")
-    #         start_parsing_by_source()
-    #         print("start_parsing_by_keyword")
-    #         start_parsing_by_keyword()
-    #         django.db.close_old_connections()
-    #     except Exception as e:
-    #         print(e)
-        # time.sleep(5*60)
-    # a = Account.objects.get(id=321)
-    # print(a)
-    # print(a.cookie)
-    # json.loads(a.cookie)
-    # print(json.loads(a.cookie))
-    # face = FacebookScraper()
-    # face.session.cookies.update(cookiejar_from_dict(json.loads(a.cookie)))
-    # # face.login("100081198725298", "howardsxfloyd271")
-    # face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
-    # for z in face.get_posts_by_search("авто"):
-    #     print(z)
+    i = 1
+    while True:
+        i += 1
+        time.sleep(180)
+        try:
+            django.db.close_old_connections()
+            try:
+                Account.objects.filter(taken=1,
+                                       last_parsing__lte=update_time_timezone(
+                                           timezone.now() - datetime.timedelta(minutes=60)),
+                                       ).update(taken=0, banned=0)
+            except Exception as e:
+                print(e)
+            try:
+                if i == 100:
+                    try:
+                        Keyword.objects.filter(network_id=network_id, enabled=1, taken=1).update(taken=0)
+                    except Exception as e:
+                        print(e)
+                    try:
+                        Sources.objects.filter(network_id=network_id, taken=1).update(taken=0)
+                    except Exception as e:
+                        print(e)
+                    i = 0
+            except Exception as e:
+                print(e)
+        except Exception as e:
+            print(e)
 
 
