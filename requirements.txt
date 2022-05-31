@@ -115,7 +115,6 @@ nexmo==2.5.2
 nltk==3.6.5
 numpy==1.21.1
 oauthlib==3.1.0
-ok-api==1.0.1
 olefile==0.46
 onlinesimru==1.0.17
 openpyxl==3.0.9
