@@ -35,7 +35,6 @@ dacite==1.6.0
 dateparser==1.0.0
 dbus-python==1.2.16
 decorator==4.4.2
-defer==1.0.6
 demjson3==3.0.5
 Deprecated==1.2.10
 distro==1.4.0
