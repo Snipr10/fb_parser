@@ -52,6 +52,6 @@ labml==0.4.125
 torch==1.8.1
 transformers==4.7.0
 pika==1.2.0
-
+mysqlclient==2.0.1
 facebook-page-scraper==0.1.0
 facebook-scraper==0.2.53
