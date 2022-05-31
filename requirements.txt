@@ -210,11 +210,8 @@ transformers==4.7.0
 twilio==6.45.2
 typing-extensions==3.10.0.2
 tzdata==2021.5
-tzlocal==4.1
-ufw==0.36
 unattended-upgrades==0.1
 urllib3==1.26.7
-usb-creator==0.3.7
 uvicorn==0.13.2
 uvloop==0.14.0
 vine==5.0.0
