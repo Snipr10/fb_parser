@@ -161,7 +161,6 @@ PySocks==1.7.1
 pyTelegramBotAPI==4.2.0
 pytest==6.2.5
 python-dateutil==2.8.2
-python-debian===0.1.36ubuntu1
 python-dotenv==0.15.0
 python-pptx==0.6.18
 python-slugify==3.0.2
@@ -219,8 +218,6 @@ twilio==6.45.2
 typing-extensions==3.10.0.2
 tzdata==2021.5
 tzlocal==4.1
-ubuntu-advantage-tools==27.7
-ubuntu-drivers-common==0.0.0
 ufw==0.36
 unattended-upgrades==0.1
 urllib3==1.26.7
