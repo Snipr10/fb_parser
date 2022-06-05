@@ -71,7 +71,7 @@ if __name__ == '__main__':
     #
     # x = threading.Thread(target=update_, args=(0,))
     # x.start()
-    from core.models import Account, Keyword, Sources
+    from core.models import Account, Keyword, Sources, SourcesItems
     from fb_parser.tasks import start_parsing_by_keyword, start_parsing_by_source
     from fb_parser.utils.find_data import update_time_timezone
     import datetime
@@ -112,6 +112,16 @@ if __name__ == '__main__':
                     except Exception as e:
                         print(e)
                     i = 0
+            except Exception as e:
+                print(e)
+            try:
+                select_sources = Sources.objects.filter(status=0)
+                sources_item = SourcesItems.objects.filter(network_id=3, disabled=0, taken=0,
+                                                           last_modified__isnull=False,
+                                                           source_id__in=list(
+                                                               select_sources.values_list('id', flat=True))
+                                                           )
+                sources_item.update(disabled=1)
             except Exception as e:
                 print(e)
         except Exception as e:
