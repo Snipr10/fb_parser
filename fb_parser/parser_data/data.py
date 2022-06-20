@@ -236,13 +236,13 @@ def search_source(face_session, account, source, retro):
         except Exception as e:
             if "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e):
                 source.disabled = 1
-                source.save()
+                source.save(update_fields=["disabled"])
             raise e
         saver(results)
         django.db.close_old_connections()
         source.taken = 0
         source.last_modified = update_time_timezone(timezone.localtime())
-        source.save()
+        source.save(update_fields=["last_modified", "taken"])
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
         account.save()
