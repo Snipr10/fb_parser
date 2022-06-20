@@ -111,7 +111,7 @@ def start_parsing_by_source():
             finally:
                 django.db.close_old_connections()
                 sources_item.taken = 0
-                sources_item.save()
+                sources_item.save(update_fields=["taken"])
 
 
 @app.task
