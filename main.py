@@ -16,7 +16,7 @@ Task = []
 
 
 def new_process_key(i):
-    for i in range(3):
+    for i in range(5):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
@@ -34,7 +34,7 @@ def start_parsing_by_keyword_while():
 
 
 def new_process_source(i):
-    for i in range(3):
+    for i in range(5):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
@@ -77,12 +77,12 @@ if __name__ == '__main__':
     import datetime
     from fb_parser.settings import network_id
 
-    # for i in range(2):
-    #     time.sleep(10)
-    #     print("thread new_process_key " + str(i))
-    #     x = threading.Thread(target=new_process_key, args=(i,))
-    #     x.start()
-    for i in range(2):
+    for i in range(3):
+        time.sleep(10)
+        print("thread new_process_key " + str(i))
+        x = threading.Thread(target=new_process_key, args=(i,))
+        x.start()
+    for i in range(3):
         time.sleep(10)
         print("thread new_process_source " + str(i))
         x = threading.Thread(target=new_process_source, args=(i,))
