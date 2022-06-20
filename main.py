@@ -77,11 +77,11 @@ if __name__ == '__main__':
     import datetime
     from fb_parser.settings import network_id
 
-    for i in range(2):
-        time.sleep(10)
-        print("thread new_process_key " + str(i))
-        x = threading.Thread(target=new_process_key, args=(i,))
-        x.start()
+    # for i in range(2):
+    #     time.sleep(10)
+    #     print("thread new_process_key " + str(i))
+    #     x = threading.Thread(target=new_process_key, args=(i,))
+    #     x.start()
     for i in range(2):
         time.sleep(10)
         print("thread new_process_source " + str(i))
