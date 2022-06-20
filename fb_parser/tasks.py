@@ -59,7 +59,7 @@ def start_parsing_by_keyword():
                 if face_session:
                     search(face_session, account, key_word)
                 else:
-                    time.sleep(15 * 60)
+                    time.sleep(5 * 60)
             finally:
                 django.db.close_old_connections()
                 key_word.taken = 0
@@ -107,7 +107,7 @@ def start_parsing_by_source():
                 if face_session:
                     search_source(face_session, account, sources_item, retro_date)
                 else:
-                    time.sleep(15 * 60)
+                    time.sleep(5 * 60)
             finally:
                 django.db.close_old_connections()
                 sources_item.taken = 0
