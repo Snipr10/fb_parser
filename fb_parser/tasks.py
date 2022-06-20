@@ -97,7 +97,7 @@ def start_parsing_by_source():
         except Exception:
             pass
         sources_item.taken = 1
-        sources_item.save()
+        sources_item.save(update_fields=["taken"])
         time_ = select_source.sources
 
         if last_modified is None or (last_modified + datetime.timedelta(minutes=time_) <

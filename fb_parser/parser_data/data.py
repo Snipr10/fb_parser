@@ -234,6 +234,7 @@ def search_source(face_session, account, source, retro):
                     break
                 limit += 1
         except Exception as e:
+            print(f"search_source {source} {e}")
             if "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e):
                 source.disabled = 1
                 source.save(update_fields=["disabled"])
