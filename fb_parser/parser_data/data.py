@@ -224,15 +224,17 @@ def search_source(face_session, account, source, retro):
         results = []
         try:
             for p in face_session.get_posts(source.data):
-                # print(p)
-                results.append(p)
-                print(p['time'])
-                print(p['text'][:10])
+                try:
+                    results.append(p)
+                    print(p['time'])
+                    print(p['text'][:10])
 
-                # if limit > 150 or p['time'] < retro:
-                if limit > 150:
-                    break
-                limit += 1
+                    # if limit > 150 or p['time'] < retro:
+                    if limit > 150:
+                        break
+                    limit += 1
+                except Exception as e:
+                    print(e)
         except Exception as e:
             print(f"search_source {source} {e}")
             if "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e):
@@ -263,13 +265,13 @@ def search(face_session, account, keyword):
         results = []
         print(keyword.keyword)
         for p in face_session.get_posts_by_search(keyword.keyword):
-            print(p['time'])
-            print(p['text'][:10])
-            results.append(p)
-            if limit > 250:
-                break
-            limit += 1
-
+            try:
+                results.append(p)
+                if limit > 250:
+                    break
+                limit += 1
+            except Exception as e:
+                print(e)
         saver(results)
         django.db.close_old_connections()
         keyword.taken = 0
