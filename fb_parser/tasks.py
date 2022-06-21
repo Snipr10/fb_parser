@@ -63,7 +63,7 @@ def start_parsing_by_keyword():
             finally:
                 django.db.close_old_connections()
                 key_word.taken = 0
-                key_word.save()
+                key_word.save(update_fields=["taken"])
 
 
 @app.task

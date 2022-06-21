@@ -276,7 +276,8 @@ def search(face_session, account, keyword):
         django.db.close_old_connections()
         keyword.taken = 0
         keyword.last_modified = update_time_timezone(timezone.localtime())
-        keyword.save()
+        keyword.save(update_fields=["taken", "last_modified"])
+
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
         account.save()
