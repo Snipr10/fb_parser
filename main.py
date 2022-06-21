@@ -82,11 +82,11 @@ if __name__ == '__main__':
         print("thread new_process_key " + str(i))
         x = threading.Thread(target=new_process_key, args=(i,))
         x.start()
-    for i in range(3):
-        time.sleep(10)
-        print("thread new_process_source " + str(i))
-        x = threading.Thread(target=new_process_source, args=(i,))
-        x.start()
+    # for i in range(3):
+    #     time.sleep(10)
+    #     print("thread new_process_source " + str(i))
+    #     x = threading.Thread(target=new_process_source, args=(i,))
+    #     x.start()
 
     i = 1
     while True:
