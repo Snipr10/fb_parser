@@ -240,6 +240,10 @@ def search_source(face_session, account, source, retro):
             if "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e):
                 source.disabled = 1
                 source.save(update_fields=["disabled"])
+            if "Content Not Found" in str(e):
+                source.taken = 0
+                source.last_modified = update_time_timezone(timezone.localtime())
+                source.save(update_fields=["last_modified", "taken"])
             raise e
         saver(results)
         django.db.close_old_connections()
