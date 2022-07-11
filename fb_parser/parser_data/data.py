@@ -248,8 +248,9 @@ def search_source(face_session, account, source, retro):
         saver(results)
         django.db.close_old_connections()
         source.taken = 0
+        source.reindexing = 0
         source.last_modified = update_time_timezone(timezone.localtime())
-        source.save(update_fields=["last_modified", "taken"])
+        source.save(update_fields=["last_modified", "taken", "reindexing"])
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
         account.save()
@@ -279,8 +280,9 @@ def search(face_session, account, keyword):
         saver(results)
         django.db.close_old_connections()
         keyword.taken = 0
+        keyword.reindexing = 0
         keyword.last_modified = update_time_timezone(timezone.localtime())
-        keyword.save(update_fields=["taken", "last_modified"])
+        keyword.save(update_fields=["taken", "last_modified", "reindexing"])
 
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0

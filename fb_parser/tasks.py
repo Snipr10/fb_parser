@@ -39,9 +39,13 @@ def start_parsing_by_keyword():
     # delete id
     print("key_word")
 
-    key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
+    key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0, reindexing=1,
                                              id__in=list(key_source.values_list('keyword_id', flat=True))
                                              ).order_by('last_modified').first()
+    if key_word is None:
+        key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
+                                                 id__in=list(key_source.values_list('keyword_id', flat=True))
+                                                 ).order_by('last_modified')
 
     if key_word is not None:
         print(key_word)
@@ -78,9 +82,16 @@ def start_parsing_by_source():
 
         return
     sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
+                                                      reindexing=1,
                                                       last_modified__isnull=False,
                                                       source_id__in=list(select_sources.values_list('id', flat=True))
                                                       ).order_by('last_modified').first()
+    if sources_item is None:
+        sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
+                                                          last_modified__isnull=False,
+                                                          source_id__in=list(
+                                                              select_sources.values_list('id', flat=True))
+                                                          ).order_by('last_modified').first()
 
     if sources_item is not None:
         print(sources_item)
