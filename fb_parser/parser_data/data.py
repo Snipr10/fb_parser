@@ -256,6 +256,8 @@ def search_source(face_session, account, source, retro):
         account.save()
     except Exception as e:
         account.last_parsing = update_time_timezone(timezone.localtime())
+        if "You’re Temporarily Blocked" in str(e):
+            account.banned = 1
         account.error = str(e)
         account.taken = 0
         account.save()
@@ -289,6 +291,8 @@ def search(face_session, account, keyword):
         account.save()
     except Exception as e:
         account.last_parsing = update_time_timezone(timezone.localtime())
+        if "You’re Temporarily Blocked" in str(e):
+            account.banned = 1
         account.error = str(e)
         account.taken = 0
         account.save()
@@ -310,18 +314,27 @@ def saver(results):
             post_url = z['post_url']
             group_id = z['page_id'] if z['page_id'] else user_id
             post_content.append(models.PostContent(post_id=post_id, content=content))
-            posts.append(models.Post(id=post_id, user_id=user_id, group_id=group_id,
-                                     created_date=z['time'],
-                                     sphinx_id=get_sphinx_id(post_url),
-                                     likes_count=z['likes'],
-                                     comments_count=z['comments'],
-                                     repost_count=z['shares'],
-                                     url=post_url,
-                                     content_hash = get_md5_text(content)
-
-            ))
+            posts.append(
+                models.Post(id=post_id,
+                            user_id=user_id,
+                            group_id=group_id,
+                            created_date=z['time'],
+                            sphinx_id=get_sphinx_id(post_url),
+                            likes_count=z['likes'],
+                            comments_count=z['comments'],
+                            repost_count=z['shares'],
+                            url=post_url,
+                            content_hash=get_md5_text(content)
+                            )
+            )
             user_url = z['user_url'].split("?")[0]
-            users.append(models.User(id=user_id, screen_name=z['user_id'], logo="", url=user_url,
+            if user_url[-1] == "/":
+                user_url = user_url[:-1]
+            try:
+                username = user_url.split("/")[-1]
+            except Exception as e:
+                username = None
+            users.append(models.User(id=user_id, screen_name=z['user_id'], username=username, logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url),
                                      name=z['username']))
         except Exception as e:
@@ -330,8 +343,13 @@ def saver(results):
     #     models.User.objects.bulk_update(users, ['updated', ], batch_size=batch_size)
     # except Exception as e:
     #     print(e)
+
     try:
         models.User.objects.bulk_create(users, batch_size=batch_size, ignore_conflicts=True)
+    except Exception as e:
+        print(e)
+    try:
+        models.User.objects.bulk_update(users, ['screen_name', 'logo', 'name', 'followers', 'username'], batch_size=batch_size)
     except Exception as e:
         print(e)
     try:

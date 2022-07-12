@@ -46,6 +46,7 @@ class User(models.Model):
     bdate = models.DateField(null=True, blank=True)
     followers = models.IntegerField(default=0, null=True, blank=True)
     last_modify = models.DateTimeField()
+    username = models.CharField(max_length=255)
 
     class Meta:
         db_table = 'prsr_parser_fb_users'
