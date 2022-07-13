@@ -334,7 +334,7 @@ def saver(results):
                 username = user_url.split("/")[-1]
             except Exception as e:
                 username = None
-            users.append(models.User(id=user_id, screen_name=z['user_id'], username=username, logo="", url=user_url,
+            users.append(models.User(id=user_id, screen_name=user_id, username=username, logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url),
                                      name=z['username']))
         except Exception as e:
@@ -350,6 +350,14 @@ def saver(results):
         print(e)
     try:
         models.User.objects.bulk_update(users, ['screen_name', 'logo', 'name', 'followers', 'username'], batch_size=batch_size)
+    except Exception as e:
+        print(e)
+    try:
+        for u in users:
+            try:
+                u.save()
+            except Exception as e:
+                print(e)
     except Exception as e:
         print(e)
     try:
