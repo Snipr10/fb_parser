@@ -45,7 +45,7 @@ def start_parsing_by_keyword():
     if key_word is None:
         key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
                                                  id__in=list(key_source.values_list('keyword_id', flat=True))
-                                                 ).order_by('last_modified')
+                                                 ).order_by('last_modified').first()
 
     if key_word is not None:
         print(key_word)
