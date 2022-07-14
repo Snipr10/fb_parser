@@ -248,8 +248,12 @@ def search_source(face_session, account, source, retro):
         saver(results)
         django.db.close_old_connections()
         source.taken = 0
-        source.reindexing = 0
-        source.last_modified = update_time_timezone(timezone.localtime())
+        if len(results) >= 0:
+            source.reindexing = 0
+            source.last_modified = update_time_timezone(timezone.localtime())
+        else:
+            account.error = "Can not get result"
+
         source.save(update_fields=["last_modified", "taken", "reindexing"])
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
@@ -345,14 +349,20 @@ def saver(results):
     #     print(e)
 
     try:
+        django.db.close_old_connections()
+
         models.User.objects.bulk_create(users, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
         print(e)
     try:
+        django.db.close_old_connections()
+
         models.User.objects.bulk_update(users, ['screen_name', 'logo', 'name', 'followers', 'username'], batch_size=batch_size)
     except Exception as e:
         print(e)
     try:
+        django.db.close_old_connections()
+
         for u in users:
             try:
                 u.save()
@@ -361,13 +371,18 @@ def saver(results):
     except Exception as e:
         print(e)
     try:
+        django.db.close_old_connections()
+
         models.Post.objects.bulk_create(posts, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
         print(e)
     try:
+        django.db.close_old_connections()
+
         models.PostContent.objects.bulk_create(post_content, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
         print(e)
+
 
 def get_data_from_url(post, proxy):
     url = 'https://m.facebook.com/story.php?story_fbid=%s&id=%s' % (post.id, post.group_id)
