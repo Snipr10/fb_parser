@@ -254,7 +254,7 @@ def search_source(face_session, account, source, retro):
         else:
             account.error = "Can not get result"
 
-        source.save(update_fields=["last_modified", "taken", "reindexing"])
+        source.save(update_fields=["last_modified", "taken", "reindexing", "error"])
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
         account.save()
