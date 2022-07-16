@@ -15,12 +15,22 @@ from requests.cookies import cookiejar_from_dict
 logger = logging.getLogger(__file__)
 
 
-def get_session():
+def get_session(is_special=False):
     print("get_session")
-    account = models.Account.objects.filter(taken=False, banned=False,
-                                            last_parsing__lte=update_time_timezone(timezone.now() - datetime.timedelta(minutes=20)),
-                                            proxy_id__isnull=False).order_by(
-        'last_parsing').first()
+    if is_special:
+        account = models.Account.objects.filter(taken=False, banned=False,
+                                                special_group=1,
+                                                last_parsing__lte=update_time_timezone(
+                                                    timezone.now() - datetime.timedelta(minutes=20)),
+                                                proxy_id__isnull=False).order_by(
+            'last_parsing').first()
+    else:
+        account = models.Account.objects.filter(taken=False, banned=False,
+                                                special_group=0,
+                                                last_parsing__lte=update_time_timezone(
+                                                    timezone.now() - datetime.timedelta(minutes=20)),
+                                                proxy_id__isnull=False).order_by(
+            'last_parsing').first()
     print(account)
 
     if account is None:

@@ -15,37 +15,38 @@ BOT = None
 Task = []
 
 
-def new_process_key(i):
+def new_process_key(i, special_group=False):
     for i in range(2):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
-        x = multiprocessing.Process(target=start_parsing_by_keyword_while, args=())
+        x = multiprocessing.Process(target=start_parsing_by_keyword_while, args=(special_group, ))
         x.start()
 
 
-def start_parsing_by_keyword_while():
+def start_parsing_by_keyword_while(special_group=False):
     while True:
         try:
-            start_parsing_by_keyword()
+            start_parsing_by_keyword(special_group)
         except Exception as e:
             print(e)
             time.sleep(5 * 60)
 
 
-def new_process_source(i):
+def new_process_source(i, special_group=False):
     for i in range(2):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
-        x = multiprocessing.Process(target=start_parsing_by_source_while, args=())
+        x = multiprocessing.Process(target=start_parsing_by_source_while, args=(special_group,))
         x.start()
 
 
-def start_parsing_by_source_while():
+def start_parsing_by_source_while(special_group=False):
+    print(special_group)
     while True:
         try:
-            start_parsing_by_source()
+            start_parsing_by_source(special_group)
         except Exception as e:
             print(e)
             time.sleep(5 * 60)
@@ -80,12 +81,25 @@ if __name__ == '__main__':
     for i in range(1):
         time.sleep(10)
         print("thread new_process_key " + str(i))
-        x = threading.Thread(target=new_process_key, args=(i,))
+        x = threading.Thread(target=new_process_key, args=(i, True,))
         x.start()
+
+    for i in range(1):
+        time.sleep(10)
+        print("thread new_process_key " + str(i))
+        x = threading.Thread(target=new_process_key, args=(i, False,))
+        x.start()
+
     for i in range(1):
         time.sleep(10)
         print("thread new_process_source " + str(i))
-        x = threading.Thread(target=new_process_source, args=(i,))
+        x = threading.Thread(target=new_process_source, args=(i, True,))
+        x.start()
+
+    for i in range(1):
+        time.sleep(10)
+        print("thread new_process_source " + str(i))
+        x = threading.Thread(target=new_process_source, args=(i, False,))
         x.start()
 
     i = 1

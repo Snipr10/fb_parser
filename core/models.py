@@ -173,6 +173,15 @@ class Sources(models.Model):
         db_table = 'prsr_parser_sources'
 
 
+class SourcesSpecial(models.Model):
+    source_id = models.IntegerField()
+    keyword_id = models.IntegerField()
+    source_item_id = models.IntegerField()
+
+    class Meta:
+        db_table = 'prsr_parser_source_special'
+
+
 class SourcesItems(models.Model):
     source_id = models.IntegerField()
     network_id = models.IntegerField(default=0)
@@ -226,6 +235,7 @@ class Account(models.Model):
     start_parsing = models.DateTimeField(null=True, blank=True)
     last_parsing = models.DateTimeField(null=True, blank=True)
     error = models.CharField(default='', max_length=1000)
+    special_group = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'prsr_parser_fb_account'

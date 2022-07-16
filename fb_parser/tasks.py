@@ -24,7 +24,7 @@ logger = logging.getLogger(__file__)
 
 
 @app.task
-def start_parsing_by_keyword():
+def start_parsing_by_keyword(special_group=False):
     print("start_parsing_by_keyword")
     django.db.close_old_connections()
 
@@ -39,13 +39,36 @@ def start_parsing_by_keyword():
     # delete id
     print("key_word")
 
-    key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0, reindexing=1,
-                                             id__in=list(key_source.values_list('keyword_id', flat=True))
-                                             ).order_by('last_modified').first()
-    if key_word is None:
-        key_word = models.Keyword.objects.filter(network_id=network_id, enabled=1, taken=0,
-                                                 id__in=list(key_source.values_list('keyword_id', flat=True))
-                                                 ).order_by('last_modified').first()
+    keyword_id_in = list(models.SourcesSpecial.objects.all().values_list('keyword_id', flat=True))
+
+    if special_group:
+        key_word = models.Keyword.objects.filter(id__in=keyword_id_in).filter(
+            network_id=network_id,
+            enabled=1,
+            taken=0,
+            reindexing=1,
+            id__in=list(key_source.values_list('keyword_id', flat=True))
+        ).order_by('last_modified').first()
+        if key_word is None:
+            key_word = models.Keyword.objects.filter(id__in=keyword_id_in).filter(network_id=network_id, enabled=1,
+                                                                                  taken=0,
+                                                                                  id__in=list(key_source.values_list(
+                                                                                      'keyword_id', flat=True))
+                                                                                  ).order_by('last_modified').first()
+    else:
+        key_word = models.Keyword.objects.filter(~Q(id__in=keyword_id_in)).filter(network_id=network_id, enabled=1,
+                                                                                  taken=0, reindexing=1,
+                                                                                  id__in=list(key_source.values_list(
+                                                                                      'keyword_id', flat=True))
+                                                                                  ).order_by('last_modified').first()
+        if key_word is None:
+            key_word = models.Keyword.objects.filter(~Q(id__in=keyword_id_in)).filter(network_id=network_id, enabled=1,
+                                                                                      taken=0,
+                                                                                      id__in=list(
+                                                                                          key_source.values_list(
+                                                                                              'keyword_id', flat=True))
+                                                                                      ).order_by(
+                'last_modified').first()
 
     if key_word is not None:
         print(key_word)
@@ -59,7 +82,7 @@ def start_parsing_by_keyword():
             key_word.taken = 1
             key_word.save()
             try:
-                face_session, account = get_session()
+                face_session, account = get_session(special_group)
                 if face_session:
                     search(face_session, account, key_word)
                 else:
@@ -71,7 +94,7 @@ def start_parsing_by_keyword():
 
 
 @app.task
-def start_parsing_by_source():
+def start_parsing_by_source(special_group=False):
     django.db.close_old_connections()
 
     select_sources = models.Sources.objects.filter(
@@ -81,18 +104,38 @@ def start_parsing_by_source():
         print("not select_sources")
 
         return
-    sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
-                                                      reindexing=1,
-                                                      last_modified__isnull=False,
-                                                      source_id__in=list(select_sources.values_list('id', flat=True))
-                                                      ).order_by('last_modified').first()
-    if sources_item is None:
+    source_special_in = list(models.SourcesSpecial.objects.all().values_list('source_item_id', flat=True))
+
+    if special_group:
         sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
+                                                          reindexing=1,
+                                                          id__in=source_special_in,
                                                           last_modified__isnull=False,
                                                           source_id__in=list(
                                                               select_sources.values_list('id', flat=True))
                                                           ).order_by('last_modified').first()
-
+        if sources_item is None:
+            sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
+                                                              last_modified__isnull=False,
+                                                              id__in=source_special_in,
+                                                              source_id__in=list(
+                                                                  select_sources.values_list('id', flat=True))
+                                                              ).order_by('last_modified').first()
+    else:
+        sources_item = models.SourcesItems.objects.filter(~Q(id__in=source_special_in),
+                                                          network_id=network_id, disabled=0, taken=0,
+                                                          reindexing=1,
+                                                          last_modified__isnull=False,
+                                                          source_id__in=list(
+                                                              select_sources.values_list('id', flat=True))
+                                                          ).order_by('last_modified').first()
+        if sources_item is None:
+            sources_item = models.SourcesItems.objects.filter(~Q(id__in=source_special_in),
+                                                              network_id=network_id, disabled=0, taken=0,
+                                                              last_modified__isnull=False,
+                                                              source_id__in=list(
+                                                                  select_sources.values_list('id', flat=True))
+                                                              ).order_by('last_modified').first()
     if sources_item is not None:
         print(sources_item)
         select_source = select_sources.get(id=sources_item.source_id)
@@ -102,7 +145,7 @@ def start_parsing_by_source():
         last_modified = sources_item.last_modified
         try:
             last_modified_up = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
-                                              last_modified.hour, last_modified.minute, last_modified.second)
+                                                 last_modified.hour, last_modified.minute, last_modified.second)
             if retro_date < last_modified_up:
                 retro_date = last_modified_up
         except Exception:
@@ -114,7 +157,7 @@ def start_parsing_by_source():
         if last_modified is None or (last_modified + datetime.timedelta(minutes=time_) <
                                      update_time_timezone(timezone.localtime())):
             try:
-                face_session, account = get_session()
+                face_session, account = get_session(special_group)
                 if face_session:
                     search_source(face_session, account, sources_item, retro_date)
                 else:
