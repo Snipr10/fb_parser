@@ -40,6 +40,8 @@ def start_parsing_by_keyword(special_group=False):
     print(f"key_word special_group {special_group}" )
 
     keyword_id_in = list(models.SourcesSpecial.objects.all().values_list('keyword_id', flat=True))
+
+    keyword_id_in = [x for x in keyword_id_in if x is not None]
     print(f"keyword_id_in {keyword_id_in}")
     if special_group:
         key_word = models.Keyword.objects.filter(id__in=keyword_id_in).filter(
@@ -105,6 +107,7 @@ def start_parsing_by_source(special_group=False):
 
         return
     source_special_in = list(models.SourcesSpecial.objects.all().values_list('source_item_id', flat=True))
+    source_special_in = [x for x in source_special_in if x is not None]
 
     if special_group:
         sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
