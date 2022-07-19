@@ -25,19 +25,19 @@ logger = logging.getLogger(__file__)
 
 @app.task
 def start_parsing_by_keyword(special_group=False):
-    print("start_parsing_by_keyword")
+    print(f"start_parsing_by_keyword special_group {special_group}" )
     django.db.close_old_connections()
 
     select_sources = models.Sources.objects.filter(
         Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
         status=1)
     if not select_sources.exists():
-        print("not select_sources")
+        print(f"not select_sources special_group {special_group}")
         return
-    print("key_source")
+    print(f"key_source special_group {special_group}" )
     key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
     # delete id
-    print("key_word")
+    print(f"key_word special_group {special_group}" )
 
     keyword_id_in = list(models.SourcesSpecial.objects.all().values_list('keyword_id', flat=True))
 
@@ -71,7 +71,7 @@ def start_parsing_by_keyword(special_group=False):
                 'last_modified').first()
 
     if key_word is not None:
-        print(key_word)
+        print(f"{key_word} special_group {special_group}")
         select_source = select_sources.get(id=key_source.filter(keyword_id=key_word.id).first().source_id)
         last_update = key_word.last_modified
         time_ = select_source.sources

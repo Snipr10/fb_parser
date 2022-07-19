@@ -16,7 +16,7 @@ logger = logging.getLogger(__file__)
 
 
 def get_session(is_special=False):
-    print("get_session")
+    print(f"get_session is_special {is_special}")
     if is_special:
         account = models.Account.objects.filter(taken=False, banned=False,
                                                 special_group=1,
