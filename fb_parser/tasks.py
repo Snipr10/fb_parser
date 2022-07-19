@@ -40,7 +40,7 @@ def start_parsing_by_keyword(special_group=False):
     print(f"key_word special_group {special_group}" )
 
     keyword_id_in = list(models.SourcesSpecial.objects.all().values_list('keyword_id', flat=True))
-
+    print(f"keyword_id_in {keyword_id_in}")
     if special_group:
         key_word = models.Keyword.objects.filter(id__in=keyword_id_in).filter(
             network_id=network_id,
