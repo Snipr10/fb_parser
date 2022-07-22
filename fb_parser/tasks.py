@@ -345,7 +345,7 @@ def start_parsing_account_source():
             if not select_sources.exists():
                 print("not select_sources")
                 return
-
+            print(1)
             source_account_special_in = list(
                 models.SourcesAccountsItems.objects.filter(account_id=account.id).values_list('source_id', flat=True))
             source_account_special_in = [x for x in source_account_special_in if x is not None]
@@ -357,10 +357,14 @@ def start_parsing_account_source():
                                                               source_id__in=list(
                                                                   select_sources.values_list('id', flat=True))
                                                               ).order_by('last_modified').first()
+            print(2)
+
             if sources_item is None:
                 account.last_parsing = update_time_timezone(timezone.localtime())
                 account.taken = 0
                 account.save()
+            print(3)
+
             if sources_item is not None:
                 select_source = select_sources.get(id=sources_item.source_id)
                 retro = select_source.retro
@@ -377,6 +381,7 @@ def start_parsing_account_source():
                 sources_item.taken = 1
                 sources_item.save(update_fields=["taken"])
                 time_ = select_source.sources
+                print(4)
 
                 if last_modified is None or (last_modified + datetime.timedelta(minutes=time_) <
                                              update_time_timezone(timezone.localtime())):
