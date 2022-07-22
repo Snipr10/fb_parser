@@ -46,6 +46,7 @@ def get_session(is_special=False, is_join=False):
     if account is None:
         return None, None
     try:
+        print("account taken")
         # proxy = models.AllProxy.objects.get(id=account.proxy_id)
         account.taken = True
         account.start_parsing = update_time_timezone(timezone.now())
@@ -58,6 +59,8 @@ def get_session(is_special=False, is_join=False):
         face.set_proxy('http://{}:{}@{}:{}'.format(proxy.login, proxy.proxy_password, proxy.ip, proxy.port))
 
         # face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
+        print("face, account")
+
         return face, account
     except Exception as e:
         print(e)
