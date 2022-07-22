@@ -97,68 +97,68 @@ if __name__ == '__main__':
     x = threading.Thread(target=new_process_account_item, args=(0, ))
     x.start()
     #
-    # for i in range(2):
-    #     time.sleep(10)
-    #     print("thread new_process_source " + str(i))
-    #     x = threading.Thread(target=new_process_source, args=(i, True,))
-    #     x.start()
-    #
-    # for i in range(2):
-    #     time.sleep(10)
-    #     print("thread new_process_source " + str(i))
-    #     x = threading.Thread(target=new_process_source, args=(i, False,))
-    #     x.start()
-    #
-    # for i in range(2):
-    #     time.sleep(10)
-    #     print("thread new_process_key " + str(i))
-    #     x = threading.Thread(target=new_process_key, args=(i, False,))
-    #     x.start()
-    #
-    # for i in range(2):
-    #     time.sleep(10)
-    #     print("thread new_process_key " + str(i))
-    #     x = threading.Thread(target=new_process_key, args=(i, True,))
-    #     x.start()
-    #
-    #
-    # i = 1
-    # while True:
-    #     i += 1
-    #     time.sleep(180)
-    #     try:
-    #         django.db.close_old_connections()
-    #         try:
-    #             Account.objects.filter(taken=1,
-    #                                    last_parsing__lte=update_time_timezone(
-    #                                        timezone.now() - datetime.timedelta(minutes=60)),
-    #                                    ).update(taken=0, banned=0)
-    #         except Exception as e:
-    #             print(e)
-    #         try:
-    #             if i == 100:
-    #                 try:
-    #                     Keyword.objects.filter(network_id=network_id, enabled=1, taken=1).update(taken=0)
-    #                 except Exception as e:
-    #                     print(e)
-    #                 try:
-    #                     Sources.objects.filter(network_id=network_id, taken=1).update(taken=0)
-    #                 except Exception as e:
-    #                     print(e)
-    #                 i = 0
-    #         except Exception as e:
-    #             print(e)
-    #         try:
-    #             select_sources = Sources.objects.filter(status=0)
-    #             sources_item = SourcesItems.objects.filter(network_id=3, disabled=0, taken=0,
-    #                                                        last_modified__isnull=False,
-    #                                                        source_id__in=list(
-    #                                                            select_sources.values_list('id', flat=True))
-    #                                                        )
-    #             sources_item.update(disabled=1)
-    #         except Exception as e:
-    #             print(e)
-    #     except Exception as e:
-    #         print(e)
+    for i in range(2):
+        time.sleep(10)
+        print("thread new_process_source " + str(i))
+        x = threading.Thread(target=new_process_source, args=(i, True,))
+        x.start()
+
+    for i in range(2):
+        time.sleep(10)
+        print("thread new_process_source " + str(i))
+        x = threading.Thread(target=new_process_source, args=(i, False,))
+        x.start()
+
+    for i in range(2):
+        time.sleep(10)
+        print("thread new_process_key " + str(i))
+        x = threading.Thread(target=new_process_key, args=(i, False,))
+        x.start()
+
+    for i in range(2):
+        time.sleep(10)
+        print("thread new_process_key " + str(i))
+        x = threading.Thread(target=new_process_key, args=(i, True,))
+        x.start()
+
+
+    i = 1
+    while True:
+        i += 1
+        time.sleep(180)
+        try:
+            django.db.close_old_connections()
+            try:
+                Account.objects.filter(taken=1,
+                                       last_parsing__lte=update_time_timezone(
+                                           timezone.now() - datetime.timedelta(minutes=60)),
+                                       ).update(taken=0, banned=0)
+            except Exception as e:
+                print(e)
+            try:
+                if i == 100:
+                    try:
+                        Keyword.objects.filter(network_id=network_id, enabled=1, taken=1).update(taken=0)
+                    except Exception as e:
+                        print(e)
+                    try:
+                        Sources.objects.filter(network_id=network_id, taken=1).update(taken=0)
+                    except Exception as e:
+                        print(e)
+                    i = 0
+            except Exception as e:
+                print(e)
+            try:
+                select_sources = Sources.objects.filter(status=0)
+                sources_item = SourcesItems.objects.filter(network_id=3, disabled=0, taken=0,
+                                                           last_modified__isnull=False,
+                                                           source_id__in=list(
+                                                               select_sources.values_list('id', flat=True))
+                                                           )
+                sources_item.update(disabled=1)
+            except Exception as e:
+                print(e)
+        except Exception as e:
+            print(e)
 
 
