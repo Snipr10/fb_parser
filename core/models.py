@@ -198,6 +198,14 @@ class SourcesItems(models.Model):
         db_table = 'prsr_parser_source_items'
 
 
+class SourcesAccountsItems(models.Model):
+    source_id = models.IntegerField()
+    account_id = models.IntegerField()
+
+    class Meta:
+        db_table = 'prsr_parser_fb_account_source'
+
+
 class Keyword(models.Model):
     id = models.IntegerField(primary_key=True)
     network_id = models.IntegerField(default=0)

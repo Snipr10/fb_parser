@@ -42,11 +42,27 @@ def new_process_source(i, special_group=False):
         x.start()
 
 
+def new_process_account_item(i):
+    x = multiprocessing.Process(target=start_parsing_account_source_while, args=())
+    x.start()
+
+
 def start_parsing_by_source_while(special_group=False):
     print(special_group)
     while True:
         try:
             start_parsing_by_source(special_group)
+        except Exception as e:
+            print(e)
+            time.sleep(5 * 60)
+
+
+def start_parsing_account_source_while():
+    print("start_parsing_account_source_while")
+    while True:
+        try:
+            start_parsing_account_source()
+            time.sleep(60)
         except Exception as e:
             print(e)
             time.sleep(5 * 60)
@@ -73,7 +89,7 @@ if __name__ == '__main__':
     # x = threading.Thread(target=update_, args=(0,))
     # x.start()
     from core.models import Account, Keyword, Sources, SourcesItems
-    from fb_parser.tasks import start_parsing_by_keyword, start_parsing_by_source
+    from fb_parser.tasks import start_parsing_by_keyword, start_parsing_by_source, start_parsing_account_source
     from fb_parser.utils.find_data import update_time_timezone
     import datetime
     from fb_parser.settings import network_id
@@ -101,6 +117,9 @@ if __name__ == '__main__':
         print("thread new_process_key " + str(i))
         x = threading.Thread(target=new_process_key, args=(i, True,))
         x.start()
+
+    x = threading.Thread(target=new_process_account_item, args=(0, False,))
+    x.start()
 
     i = 1
     while True:

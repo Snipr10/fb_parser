@@ -108,6 +108,8 @@ def start_parsing_by_source(special_group=False):
         return
     source_special_in = list(models.SourcesSpecial.objects.all().values_list('source_item_id', flat=True))
     source_special_in = [x for x in source_special_in if x is not None]
+    source_account_special_in = list(models.SourcesAccountsItems.objects.all().values_list('source_id', flat=True))
+    source_account_special_in = [x for x in source_account_special_in if x is not None]
 
     if special_group:
         sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
@@ -116,14 +118,16 @@ def start_parsing_by_source(special_group=False):
                                                           last_modified__isnull=False,
                                                           source_id__in=list(
                                                               select_sources.values_list('id', flat=True))
-                                                          ).order_by('last_modified').first()
+                                                          ).exclude(id__in=source_account_special_in).order_by(
+            'last_modified').first()
         if sources_item is None:
             sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
                                                               last_modified__isnull=False,
                                                               id__in=source_special_in,
                                                               source_id__in=list(
                                                                   select_sources.values_list('id', flat=True))
-                                                              ).order_by('last_modified').first()
+                                                              ).exclude(id__in=source_account_special_in).order_by(
+                'last_modified').first()
     else:
         sources_item = models.SourcesItems.objects.filter(~Q(id__in=source_special_in),
                                                           network_id=network_id, disabled=0, taken=0,
@@ -131,14 +135,16 @@ def start_parsing_by_source(special_group=False):
                                                           last_modified__isnull=False,
                                                           source_id__in=list(
                                                               select_sources.values_list('id', flat=True))
-                                                          ).order_by('last_modified').first()
+                                                          ).exclude(id__in=source_account_special_in).order_by(
+            'last_modified').first()
         if sources_item is None:
             sources_item = models.SourcesItems.objects.filter(~Q(id__in=source_special_in),
                                                               network_id=network_id, disabled=0, taken=0,
                                                               last_modified__isnull=False,
                                                               source_id__in=list(
                                                                   select_sources.values_list('id', flat=True))
-                                                              ).order_by('last_modified').first()
+                                                              ).exclude(id__in=source_account_special_in).order_by(
+                'last_modified').first()
     if sources_item is not None:
         print(sources_item)
         select_source = select_sources.get(id=sources_item.source_id)
@@ -322,3 +328,68 @@ def check_not_available_accounts():
     for account in models.Account.objects.filter().order_by("-id")[:500]:
         if not models.WorkCred.objects.filter(account_id=account.id).exists():
             check_accounts(account, attempt=0)
+
+
+def start_parsing_account_source():
+    while True:
+        try:
+            face_session, account = get_session(is_join=True)
+            if not account:
+                print("not account")
+
+                return
+
+            select_sources = models.Sources.objects.filter(
+                Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
+                status=1)
+            if not select_sources.exists():
+                print("not select_sources")
+                return
+
+            source_account_special_in = list(
+                models.SourcesAccountsItems.objects.filter(account_id=account.id).values_list('source_id', flat=True))
+            source_account_special_in = [x for x in source_account_special_in if x is not None]
+
+            sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
+                                                              reindexing=1,
+                                                              id__in=source_account_special_in,
+                                                              last_modified__isnull=False,
+                                                              source_id__in=list(
+                                                                  select_sources.values_list('id', flat=True))
+                                                              ).order_by('last_modified').first()
+            if sources_item is None:
+                account.last_parsing = update_time_timezone(timezone.localtime())
+                account.taken = 0
+                account.save()
+            if sources_item is not None:
+                select_source = select_sources.get(id=sources_item.source_id)
+                retro = select_source.retro
+
+                retro_date = datetime.datetime(retro.year, retro.month, retro.day)
+                last_modified = sources_item.last_modified
+                try:
+                    last_modified_up = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
+                                                         last_modified.hour, last_modified.minute, last_modified.second)
+                    if retro_date < last_modified_up:
+                        retro_date = last_modified_up
+                except Exception:
+                    pass
+                sources_item.taken = 1
+                sources_item.save(update_fields=["taken"])
+                time_ = select_source.sources
+
+                if last_modified is None or (last_modified + datetime.timedelta(minutes=time_) <
+                                             update_time_timezone(timezone.localtime())):
+                    try:
+                        search_source(face_session, account, sources_item, retro_date)
+                    finally:
+                        django.db.close_old_connections()
+                        sources_item.taken = 0
+                        sources_item.save(update_fields=["taken"])
+                else:
+                    account.last_parsing = update_time_timezone(timezone.localtime())
+                    account.taken = 0
+                    account.save()
+        except Exception as e:
+            print(e)
+            time.sleep(5 * 60)
