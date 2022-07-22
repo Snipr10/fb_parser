@@ -351,7 +351,6 @@ def start_parsing_account_source():
             source_account_special_in = [x for x in source_account_special_in if x is not None]
 
             sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
-                                                              reindexing=1,
                                                               id__in=source_account_special_in,
                                                               last_modified__isnull=False,
                                                               source_id__in=list(
