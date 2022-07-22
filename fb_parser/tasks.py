@@ -381,6 +381,7 @@ def start_parsing_account_source():
                 if last_modified is None or (last_modified + datetime.timedelta(minutes=time_) <
                                              update_time_timezone(timezone.localtime())):
                     try:
+                        print("search_source")
                         search_source(face_session, account, sources_item, retro_date)
                     finally:
                         django.db.close_old_connections()
