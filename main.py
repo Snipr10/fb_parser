@@ -94,7 +94,7 @@ if __name__ == '__main__':
     import datetime
     from fb_parser.settings import network_id
 
-    x = threading.Thread(target=new_process_account_item, args=(0, False,))
+    x = threading.Thread(target=new_process_account_item, args=(0, ))
     x.start()
 
     for i in range(2):
