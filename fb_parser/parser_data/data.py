@@ -317,7 +317,7 @@ def saver(results):
             user_id = z['user_id']
             post_url = z['post_url']
             group_id = z['page_id'] if z['page_id'] else user_id
-            post_content.append(models.PostContent(post_id=post_id, content=content))
+            post_content.append(models.PostContent(post_id=post_id, content=content, last_modified=datetime.datetime.now()))
             posts.append(
                 models.Post(id=post_id,
                             user_id=user_id,
@@ -339,7 +339,7 @@ def saver(results):
             except Exception as e:
                 username = None
             users.append(models.User(id=user_id, screen_name=user_id, username=username, logo="", url=user_url,
-                                     sphinx_id=get_sphinx_id(user_url),
+                                     sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
                                      name=z['username']))
         except Exception as e:
             print(e)
@@ -356,8 +356,7 @@ def saver(results):
         print(e)
     try:
         django.db.close_old_connections()
-
-        models.User.objects.bulk_update(users, ['screen_name', 'logo', 'name', 'followers', 'username'], batch_size=batch_size)
+        models.User.objects.bulk_update(users, ['screen_name', 'logo', 'name', 'followers', 'username', 'last_modified'], batch_size=batch_size)
     except Exception as e:
         print(e)
     try:

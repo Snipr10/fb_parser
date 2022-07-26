@@ -1,6 +1,7 @@
 import pytz
 from django.db import models
 from datetime import datetime, timedelta
+from django.utils.timezone import now
 
 
 class Post(models.Model):
@@ -18,7 +19,7 @@ class Post(models.Model):
     trust = models.IntegerField(null=True, blank=True)
     sphinx_id = models.IntegerField(null=True, blank=True)
     updated = models.DateField(null=True, blank=True)
-    last_modified = models.DateTimeField(default=datetime(1, 1, 1, 0, 0))
+    last_modified = models.DateTimeField(default=now)
     content_hash = models.CharField(max_length=32, null=True, blank=True)
     taken = models.IntegerField(default=0)
     url = models.CharField(max_length=255, null=True, blank=True)
@@ -30,6 +31,7 @@ class Post(models.Model):
 class PostContent(models.Model):
     post_id = models.IntegerField(primary_key=True)
     content = models.TextField(null=True, blank=True)
+    last_modified = models.DateTimeField(default=now)
 
     class Meta:
         db_table = 'prsr_parser_fb_posts_content'
@@ -47,6 +49,7 @@ class User(models.Model):
     followers = models.IntegerField(default=0, null=True, blank=True)
     last_modify = models.DateTimeField()
     username = models.CharField(max_length=255)
+    last_modified = models.DateTimeField(default=now)
 
     class Meta:
         db_table = 'prsr_parser_fb_users'
@@ -71,6 +74,7 @@ class Comment(models.Model):
     created_date = models.DateTimeField()
     likes = models.IntegerField(default=0)
     trust = models.IntegerField(null=True, blank=True)
+    # last_modified = models.DateTimeField(default=now)
 
     class Meta:
         db_table = 'prsr_parser_fb_comments'
@@ -79,6 +83,7 @@ class Comment(models.Model):
 class CommentContext(models.Model):
     id = models.IntegerField(primary_key=True)
     content = models.TextField()
+    # last_modified = models.DateTimeField(default=now)
 
     class Meta:
         db_table = 'prsr_parser_fb_comment_content'
@@ -108,6 +113,7 @@ class Likes(models.Model):
 class Photo(models.Model):
     id = models.IntegerField(primary_key=True)
     href = models.CharField(max_length=512)
+    # last_modified = models.DateTimeField(default=now)
 
     class Meta:
         db_table = 'prsr_parser_fb_photos'

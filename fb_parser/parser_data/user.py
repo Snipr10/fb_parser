@@ -9,6 +9,7 @@ from core import models
 from django.utils import timezone
 from fb_parser.utils.find_data import find_value, get_sphinx_id
 from fb_parser.utils.proxy import get_proxy, get_proxy_str, stop_proxy
+import datetime
 
 logger = logging.getLogger(__file__)
 
@@ -37,7 +38,7 @@ def get_update_user(user_id):
                     return
             if username is not None or fb_id is not None or href is not None:
                 models.User.objects.create(id=user_id, screen_name=username, name=name, url=href, sphinx_id=get_sphinx_id(href),
-                                           logo=logo, last_modify=timezone.now())
+                                           logo=logo, last_modify=timezone.now(), last_modified=datetime.datetime.now())
 
 
 def get_user_data(url, attempt=0):
