@@ -320,7 +320,7 @@ def saver(results):
             user_id = z['user_id']
             post_url = z['post_url']
             group_id = z['page_id'] if z['page_id'] else user_id
-            post_content.append(models.PostContent(post_id=post_id, content=content, last_modified=datetime.datetime.now()))
+            post_content.append(models.PostContent(post_id=post_id, content=content))
             posts.append(
                 models.Post(id=post_id,
                             user_id=user_id,

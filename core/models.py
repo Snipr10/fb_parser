@@ -31,7 +31,6 @@ class Post(models.Model):
 class PostContent(models.Model):
     post_id = models.IntegerField(primary_key=True)
     content = models.TextField(null=True, blank=True)
-    last_modified = models.DateTimeField(default=now)
 
     class Meta:
         db_table = 'prsr_parser_fb_posts_content'
