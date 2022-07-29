@@ -15,6 +15,23 @@ from requests.cookies import cookiejar_from_dict
 logger = logging.getLogger(__file__)
 
 
+def check_bot(face_session, account):
+    results_test = []
+    try:
+        for post in face_session.get_posts('161499224409433'):
+            try:
+                results_test.append(post)
+                break
+            except Exception as e:
+                print(e)
+    except Exception as e:
+        print(e)
+    if len(results_test) == 0:
+        account.banned = 1
+        account.save(update_fields=["banned"])
+        raise Exception("banned")
+
+
 def get_session(is_special=False, is_join=False):
     print(f"get_session is_special {is_special}")
     if is_join:

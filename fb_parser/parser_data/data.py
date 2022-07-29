@@ -249,6 +249,9 @@ def search_source(face_session, account, source, retro):
                 source.last_modified = update_time_timezone(timezone.localtime())
                 source.save(update_fields=["last_modified", "taken"])
             raise e
+        if len(results) == 0:
+            from fb_parser.bot.bot import check_bot
+            check_bot(face_session, account)
         saver(results)
         django.db.close_old_connections()
         source.taken = 0
@@ -261,7 +264,7 @@ def search_source(face_session, account, source, retro):
         source.save(update_fields=["last_modified", "taken", "reindexing"])
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
-        account.save()
+        account.save(update_fields=["last_modified", "taken"])
     except Exception as e:
         account.last_parsing = update_time_timezone(timezone.localtime())
         if "You’re Temporarily Blocked" in str(e):
@@ -287,6 +290,9 @@ def search(face_session, account, keyword):
                 limit += 1
             except Exception as e:
                 print(e)
+        if len(results) == 0:
+            from fb_parser.bot.bot import check_bot
+            check_bot(face_session, account)
         saver(results)
         django.db.close_old_connections()
         keyword.taken = 0
@@ -296,7 +302,7 @@ def search(face_session, account, keyword):
 
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
-        account.save()
+        account.save(update_fields=["last_modified", "taken"])
     except Exception as e:
         account.last_parsing = update_time_timezone(timezone.localtime())
         if "You’re Temporarily Blocked" in str(e):
