@@ -226,6 +226,7 @@ def search_source(face_session, account, source, retro):
             parse_url = source.data
             if source.type == 6 or source.type == "6" or source.type == 7 or source.type == "7":
                 parse_url = "groups/" + parse_url
+            print(f"{parse_url=}")
             for p in face_session.get_posts(parse_url):
                 try:
                     results.append(p)
