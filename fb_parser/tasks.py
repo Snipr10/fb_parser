@@ -113,6 +113,9 @@ def start_parsing_by_source(special_group=False):
     source_account_special_in = list(models.SourcesAccountsItems.objects.all().values_list('source_id', flat=True))
     source_account_special_in = [x for x in source_account_special_in if x is not None]
     print(3)
+    face_session, account = get_session(special_group)
+    if not face_session:
+        raise Exception("can not get_source")
 
     if special_group:
         sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
@@ -172,12 +175,9 @@ def start_parsing_by_source(special_group=False):
         if last_modified is None or (last_modified + datetime.timedelta(minutes=time_) <
                                      update_time_timezone(timezone.localtime())):
             try:
-                face_session, account = get_session(special_group)
-                if face_session:
-                    print(6)
-                    search_source(face_session, account, sources_item, retro_date)
-                else:
-                    raise Exception("can not get_source")
+                print(6)
+
+                search_source(face_session, account, sources_item, retro_date)
             finally:
                 django.db.close_old_connections()
                 sources_item.taken = 0
