@@ -97,6 +97,7 @@ def start_parsing_by_keyword(special_group=False):
 
 @app.task
 def start_parsing_by_source(special_group=False):
+    print(1)
     django.db.close_old_connections()
 
     select_sources = models.Sources.objects.filter(
@@ -106,10 +107,12 @@ def start_parsing_by_source(special_group=False):
         print("not select_sources")
 
         return
+    print(2)
     source_special_in = list(models.SourcesSpecial.objects.all().values_list('source_item_id', flat=True))
     source_special_in = [x for x in source_special_in if x is not None]
     source_account_special_in = list(models.SourcesAccountsItems.objects.all().values_list('source_id', flat=True))
     source_account_special_in = [x for x in source_account_special_in if x is not None]
+    print(3)
 
     if special_group:
         sources_item = models.SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
@@ -145,6 +148,8 @@ def start_parsing_by_source(special_group=False):
                                                                   select_sources.values_list('id', flat=True))
                                                               ).exclude(id__in=source_account_special_in).order_by(
                 'last_modified').first()
+    print(4)
+
     if sources_item is not None:
         print(sources_item)
         select_source = select_sources.get(id=sources_item.source_id)
@@ -162,12 +167,14 @@ def start_parsing_by_source(special_group=False):
         sources_item.taken = 1
         sources_item.save(update_fields=["taken"])
         time_ = select_source.sources
+        print(5)
 
         if last_modified is None or (last_modified + datetime.timedelta(minutes=time_) <
                                      update_time_timezone(timezone.localtime())):
             try:
                 face_session, account = get_session(special_group)
                 if face_session:
+                    print(6)
                     search_source(face_session, account, sources_item, retro_date)
                 else:
                     raise Exception("can not get_source")
