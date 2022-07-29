@@ -108,18 +108,18 @@ if __name__ == '__main__':
         print("thread new_process_source " + str(i))
         x = threading.Thread(target=new_process_source, args=(i, False,))
         x.start()
-
-    for i in range(2):
-        time.sleep(10)
-        print("thread new_process_key " + str(i))
-        x = threading.Thread(target=new_process_key, args=(i, False,))
-        x.start()
-
-    for i in range(2):
-        time.sleep(10)
-        print("thread new_process_key " + str(i))
-        x = threading.Thread(target=new_process_key, args=(i, True,))
-        x.start()
+    #
+    # for i in range(2):
+    #     time.sleep(10)
+    #     print("thread new_process_key " + str(i))
+    #     x = threading.Thread(target=new_process_key, args=(i, False,))
+    #     x.start()
+    #
+    # for i in range(2):
+    #     time.sleep(10)
+    #     print("thread new_process_key " + str(i))
+    #     x = threading.Thread(target=new_process_key, args=(i, True,))
+    #     x.start()
 
 
     i = 1
