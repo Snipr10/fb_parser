@@ -280,6 +280,7 @@ def search_source(face_session, account, source, retro):
 
 
 def search(face_session, account, keyword):
+    error = "start"
     try:
         print("start  search")
         limit = 0
@@ -293,24 +294,31 @@ def search(face_session, account, keyword):
                 limit += 1
             except Exception as e:
                 print(e)
+        error = "before check check_bot"
         if len(results) == 0:
             from fb_parser.bot.bot import check_bot
+            error = "before check_bot"
             check_bot(face_session, account)
+        error = "before saver"
         saver(results)
+        error = "saver"
         django.db.close_old_connections()
         keyword.taken = 0
         keyword.reindexing = 0
         keyword.last_modified = update_time_timezone(timezone.localtime())
         keyword.save(update_fields=["taken", "last_modified", "reindexing"])
+        error = "keyword"
 
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
         account.save(update_fields=["last_modified", "taken"])
+        error = "account"
+
     except Exception as e:
         account.last_parsing = update_time_timezone(timezone.localtime())
         if "You’re Temporarily Blocked" in str(e):
             account.banned = 1
-        account.error = str(e)
+        account.error = error + str(e)
         account.taken = 0
         account.save()
         print(e)
