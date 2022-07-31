@@ -16,6 +16,7 @@ logger = logging.getLogger(__file__)
 
 
 def check_bot(face_session, account):
+    print("check_bot")
     results_test = []
     try:
         for post in face_session.get_posts('161499224409433'):
@@ -25,7 +26,7 @@ def check_bot(face_session, account):
             except Exception as e:
                 print(e)
     except Exception as e:
-        print(e)
+        print(f"check_bot {e}")
     if len(results_test) == 0:
         account.banned = 1
         account.save(update_fields=["banned"])
