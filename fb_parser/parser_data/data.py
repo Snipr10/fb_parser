@@ -269,7 +269,7 @@ def search_source(face_session, account, source, retro):
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.error = str(e)
         account.taken = 0
-        if "You’re Temporarily Blocked" in str(e):
+        if "Temporarily Blocked" in str(e):
             account.banned = 1
             account.save(update_fields=["error", "taken", "last_parsing", "banned"])
         else:
@@ -316,11 +316,14 @@ def search(face_session, account, keyword):
 
     except Exception as e:
         account.last_parsing = update_time_timezone(timezone.localtime())
-        if "You’re Temporarily Blocked" in str(e):
-            account.banned = 1
-        account.error = error + str(e)
+        account.error = str(e)
         account.taken = 0
-        account.save()
+        if "Temporarily Blocked" in str(e):
+            account.banned = 1
+            account.save(update_fields=["error", "taken", "last_parsing", "banned"])
+        else:
+            account.save(update_fields=["error", "taken", "last_parsing"])
+
         print(e)
     return True
 
