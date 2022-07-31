@@ -264,7 +264,7 @@ def search_source(face_session, account, source, retro):
         source.save(update_fields=["last_modified", "taken", "reindexing"])
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
-        account.save(update_fields=["last_modified", "taken"])
+        account.save(update_fields=["last_parsing", "taken"])
     except Exception as e:
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.error = str(e)
@@ -311,7 +311,7 @@ def search(face_session, account, keyword):
 
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.taken = 0
-        account.save(update_fields=["last_modified", "taken"])
+        account.save(update_fields=["last_parsing", "taken"])
         error = "account"
 
     except Exception as e:
