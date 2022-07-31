@@ -76,7 +76,7 @@ def get_session(is_special=False, is_join=False):
         face.set_proxy('http://{}:{}@{}:{}'.format(proxy.login, proxy.proxy_password, proxy.ip, proxy.port))
 
         # face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
-        print("face, account")
+        print(f"face, account, {account}")
 
         return face, account
     except Exception as e:

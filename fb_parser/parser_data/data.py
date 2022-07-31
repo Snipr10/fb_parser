@@ -267,11 +267,14 @@ def search_source(face_session, account, source, retro):
         account.save(update_fields=["last_modified", "taken"])
     except Exception as e:
         account.last_parsing = update_time_timezone(timezone.localtime())
-        if "You’re Temporarily Blocked" in str(e):
-            account.banned = 1
         account.error = str(e)
         account.taken = 0
-        account.save()
+        if "You’re Temporarily Blocked" in str(e):
+            account.banned = 1
+            account.save(update_fields=["error", "taken", "last_parsing", "banned"])
+        else:
+            account.save(update_fields=["error", "taken", "last_parsing"])
+
         print(e)
     return True
 
