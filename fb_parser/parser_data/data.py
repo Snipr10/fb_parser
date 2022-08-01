@@ -236,7 +236,7 @@ def search_source(face_session, account, source, retro):
                     results.append(p)
 
                     # if limit > 150 or p['time'] < retro:
-                    if limit > 150:
+                    if limit > 250:
                         break
                     limit += 1
                 except Exception as e:
