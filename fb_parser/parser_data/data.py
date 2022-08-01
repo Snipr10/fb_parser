@@ -338,6 +338,8 @@ def saver(results):
         try:
             post_id = z['post_id']
             content = z['post_text']
+            if content is None:
+                content = z['text']
             user_id = z['user_id']
             post_url = z['post_url']
             group_id = z['page_id'] if z['page_id'] else user_id
