@@ -219,7 +219,6 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
 def search_source(face_session, account, source, retro):
     print("start  search source")
     print(retro)
-    save_group_user = True
 
     try:
         limit = 0
@@ -231,6 +230,10 @@ def search_source(face_session, account, source, retro):
                 parse_url = "groups/" + parse_url
             print(f"parse_url {parse_url}")
             # for p in face_session.get_posts(parse_url):
+            try:
+                group_id = save_group_info(face_session, source.data, parse_url)
+            except Exception as e:
+                group_id = None
             for p in face_session.get_posts(parse_url, page_limit=40, max_past_limit=10):
                 try:
                     if p['time'] < retro:
@@ -242,13 +245,10 @@ def search_source(face_session, account, source, retro):
                     print(p['time'])
                     if p['post_url'] is None:
                         p['post_url'] = face_session.base_url + "/" + parse_url + "/permalink/" + p['post_id']
+                    if group_id:
+                        p['page_id'] = group_id
                     results.append(p)
-                    try:
-                        if save_group_user:
-                            if p['user_id'] == p['page_id']:
-                                save_group_user = False
-                    except Exception as e:
-                        print(e)
+
                     if limit > 250 or retro_post > 10:
                         break
                     limit += 1
@@ -268,11 +268,7 @@ def search_source(face_session, account, source, retro):
             from fb_parser.bot.bot import check_bot
             check_bot(face_session, account)
         django.db.close_old_connections()
-        try:
-            if save_group_user:
-                save_group_info(face_session, source.data)
-        except Exception as e:
-            print(e)
+
         saver(results)
         source.taken = 0
         if len(results) >= 0:
@@ -382,10 +378,7 @@ def saver(results):
                                      name=z['username']))
         except Exception as e:
             print(e)
-    # try:
-    #     models.User.objects.bulk_update(users, ['updated', ], batch_size=batch_size)
-    # except Exception as e:
-    #     print(e)
+
 
     try:
         django.db.close_old_connections()
@@ -418,7 +411,7 @@ def saver(results):
 
         models.Post.objects.bulk_update(posts, [
             'created_date', 'likes_count', 'comments_count', 'repost_count',
-            'last_modified'
+            'last_modified' 'user_id', 'group_id'
         ], batch_size=batch_size)
     except Exception as e:
         print(e)
@@ -515,15 +508,14 @@ def update_count(data):
     return data
 
 
-def save_group_info(face, group):
+def save_group_info(face, group, parse_url):
     try:
-        url = f'/groups/{group}'
-        logger.debug(f"Requesting page from: {url}")
+        url = parse_url
         resp = face.get(url).html
         try:
             url = resp.find("a[href*='?view=info']", first=True).attrs["href"]
         except AttributeError:
-            return
+            return None
         logger.debug(f"Requesting page from: {url}")
         resp = face.get(url).html
         result = {}
@@ -532,16 +524,31 @@ def save_group_info(face, group):
             result["name"] = resp.find("header h3", first=True).text
             result["type"] = resp.find("header div", first=True).text
         except AttributeError:
-            return
+            return result["id"]
         try:
             int(group)
             username = None
         except Exception:
             username = group
-        user_url = "https://www.facebook.com" + f'/groups/{group}'
-        models.User.objects.create(id=result["id"], screen_name=username, username=result["id"], logo="", url=user_url,
-                                   sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
-                                   name=result["name"])
+        user_url = "https://www.facebook.com" + f'/{parse_url}'
+        try:
+            models.User.objects.create(id=result["id"], screen_name=username, username=result["id"], logo="",
+                                       url=user_url,
+                                       sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
+                                       name=result["name"])
+        except Exception:
+            models.User.objects.bulk_update(
+                [models.User(id=result["id"], screen_name=username, username=result["id"], logo="", url=user_url,
+                             sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
+                             name=result["name"])],
+                [
+                    'screen_name', 'logo', 'name', 'followers', 'username', 'screen_name',
+                    'last_modified'
+                ],
+                batch_size=batch_size)
     except Exception as e:
         print(e)
-    return
+    try:
+        return result["id"]
+    except Exception as e:
+        return None
