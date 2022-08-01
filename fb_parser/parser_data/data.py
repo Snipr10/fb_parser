@@ -23,6 +23,7 @@ logger = logging.getLogger(__file__)
 
 batch_size = 200
 
+
 def get_class_text(soup, class_name):
     try:
         return soup.find_all("div", {"class": class_name})[0].text
@@ -376,7 +377,7 @@ def saver(results):
                 username = user_url.split("/")[-1]
             except Exception as e:
                 username = None
-            users.append(models.User(id=user_id, screen_name=user_id, username=username, logo="", url=user_url,
+            users.append(models.User(id=user_id, username=user_id, screen_name=username, logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
                                      name=z['username']))
         except Exception as e:
@@ -394,7 +395,12 @@ def saver(results):
         print(e)
     try:
         django.db.close_old_connections()
-        models.User.objects.bulk_update(users, ['screen_name', 'logo', 'name', 'followers', 'username', 'last_modified'], batch_size=batch_size)
+        models.User.objects.bulk_update(users,
+                                        [
+                                            'screen_name', 'logo', 'name', 'followers', 'username', 'screen_name',
+                                            'last_modified'
+                                        ],
+                                        batch_size=batch_size)
     except Exception as e:
         print(e)
     try:
@@ -523,9 +529,9 @@ def save_group_info(face, group):
         except Exception:
             username = group
         user_url = "https://www.facebook.com" + f'/groups/{group}'
-        models.User.objects.create(id=result["id"], screen_name=result["id"], username=username, logo="", url=user_url,
-                    sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
-                    name=result["name"])
+        models.User.objects.create(id=result["id"], screen_name=username, username=result["id"], logo="", url=user_url,
+                                   sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
+                                   name=result["name"])
     except Exception as e:
         print(e)
     return
