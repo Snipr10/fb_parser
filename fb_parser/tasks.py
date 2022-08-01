@@ -377,13 +377,13 @@ def start_parsing_account_source():
 
                 retro_date = datetime.datetime(retro.year, retro.month, retro.day)
                 last_modified = sources_item.last_modified
-                try:
-                    last_modified_up = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
-                                                         last_modified.hour, last_modified.minute, last_modified.second)
-                    if retro_date < last_modified_up:
-                        retro_date = last_modified_up
-                except Exception:
-                    pass
+                # try:
+                #     last_modified_up = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,
+                #                                          last_modified.hour, last_modified.minute, last_modified.second)
+                #     if retro_date < last_modified_up:
+                #         retro_date = last_modified_up
+                # except Exception:
+                #     pass
                 sources_item.taken = 1
                 sources_item.save(update_fields=["taken"])
                 time_ = select_source.sources
