@@ -224,15 +224,18 @@ def search_source(face_session, account, source, retro):
     try:
         limit = 0
         results = []
+        retro_post = 0
         try:
             parse_url = source.data
             if source.type == 6 or source.type == "6" or source.type == 7 or source.type == "7":
                 parse_url = "groups/" + parse_url
             print(f"parse_url {parse_url}")
-            for p in face_session.get_posts(parse_url):
+            # for p in face_session.get_posts(parse_url):
+            for p in face_session.get_posts(parse_url, page_limit=40, max_past_limit=10):
                 try:
+                    if p['time'] < retro:
+                        retro_post += 1
                     print(p['time'])
-                    print(p['text'][:10])
                     if p['post_url'] is None:
                         p['post_url'] = face_session.base_url + "/" + parse_url + "/permalink/" + p['post_id']
                     results.append(p)
@@ -242,7 +245,7 @@ def search_source(face_session, account, source, retro):
                                 save_group_user = False
                     except Exception as e:
                         print(e)
-                    if limit > 250:
+                    if limit > 250 or retro_post > 10:
                         break
                     limit += 1
                 except Exception as e:
