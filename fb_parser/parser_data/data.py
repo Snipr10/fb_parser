@@ -305,7 +305,7 @@ def search(face_session, account, keyword):
         limit = 0
         results = []
         print(keyword.keyword)
-        for p in face_session.get_posts_by_search(keyword.keyword):
+        for p in face_session.get_posts_by_search(keyword.keyword, page_limit=40, max_past_limit=10):
             try:
                 results.append(p)
                 if limit > 250:
