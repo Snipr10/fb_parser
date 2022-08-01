@@ -351,7 +351,7 @@ def saver(results):
                             user_id=user_id,
                             group_id=group_id,
                             created_date=z['time'],
-                            sphinx_id=get_sphinx_id(post_url),
+                            sphinx_id=get_sphinx_id("https://facebook.com/groups/tishinka1/"),
                             likes_count=z['likes'],
                             comments_count=z['comments'],
                             repost_count=z['shares'],
