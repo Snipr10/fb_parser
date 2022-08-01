@@ -38,4 +38,4 @@ pika==1.2.0
 Django~=3.1.4
 python-dateutil~=2.8.1
 facebook-page-scraper==0.1.0
-facebook-scraper==0.2.57
+facebook-scraper==0.2.58

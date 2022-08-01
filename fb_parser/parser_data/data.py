@@ -218,6 +218,7 @@ def search_by_word(work_credit, session, proxy, fb_dtsg_ag, user, xs, token, key
 def search_source(face_session, account, source, retro):
     print("start  search source")
     print(retro)
+    save_group_user = True
 
     try:
         limit = 0
@@ -234,8 +235,12 @@ def search_source(face_session, account, source, retro):
                     if p['post_url'] is None:
                         p['post_url'] = face_session.base_url + "/" + parse_url + "/permalink/" + p['post_id']
                     results.append(p)
-
-                    # if limit > 150 or p['time'] < retro:
+                    try:
+                        if save_group_user:
+                            if p['user_id'] == p['page_id']:
+                                save_group_user = False
+                    except Exception as e:
+                        print(e)
                     if limit > 250:
                         break
                     limit += 1
@@ -254,8 +259,13 @@ def search_source(face_session, account, source, retro):
         if len(results) == 0:
             from fb_parser.bot.bot import check_bot
             check_bot(face_session, account)
-        saver(results)
         django.db.close_old_connections()
+        try:
+            if save_group_user:
+                save_group_info(face_session, source.data)
+        except Exception as e:
+            print(e)
+        saver(results)
         source.taken = 0
         if len(results) >= 0:
             source.reindexing = 0
@@ -487,3 +497,35 @@ def update_count(data):
     if data is not None:
         return re.sub('\D', '', data)
     return data
+
+
+def save_group_info(face, group):
+    try:
+        url = f'/groups/{group}'
+        logger.debug(f"Requesting page from: {url}")
+        resp = face.get(url).html
+        try:
+            url = resp.find("a[href*='?view=info']", first=True).attrs["href"]
+        except AttributeError:
+            return
+        logger.debug(f"Requesting page from: {url}")
+        resp = face.get(url).html
+        result = {}
+        result["id"] = re.search(r'/groups/(\d+)', url).group(1)
+        try:
+            result["name"] = resp.find("header h3", first=True).text
+            result["type"] = resp.find("header div", first=True).text
+        except AttributeError:
+            return
+        try:
+            int(group)
+            username = None
+        except Exception:
+            username = group
+        user_url = "https://www.facebook.com" + f'/groups/{group}'
+        models.User.objects.create(id=result["id"], screen_name=result["id"], username=username, logo="", url=user_url,
+                    sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
+                    name=result["name"])
+    except Exception as e:
+        print(e)
+    return
