@@ -229,9 +229,11 @@ def search_source(face_session, account, source, retro):
             print(f"parse_url {parse_url}")
             for p in face_session.get_posts(parse_url):
                 try:
-                    results.append(p)
                     print(p['time'])
                     print(p['text'][:10])
+                    if p['post_url'] is None:
+                        p['post_url'] = face_session.base_url + "/" + parse_url + "/permalink/" + p['post_id']
+                    results.append(p)
 
                     # if limit > 150 or p['time'] < retro:
                     if limit > 150:
@@ -333,7 +335,7 @@ def saver(results):
     users = []
     posts = []
     django.db.close_old_connections()
-
+    print("saver")
     for z in results:
         try:
             post_id = z['post_id']
