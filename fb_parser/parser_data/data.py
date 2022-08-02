@@ -239,7 +239,6 @@ def search_source(face_session, account, source, retro):
                     if p['time'] < retro:
                         retro_post += 1
                         print("not new")
-
                     else:
                         print("new")
                     print(p['time'])
@@ -248,7 +247,6 @@ def search_source(face_session, account, source, retro):
                     if group_id:
                         p['page_id'] = group_id
                     results.append(p)
-
                     if limit > 250 or retro_post > 10:
                         break
                     limit += 1
@@ -390,7 +388,7 @@ def saver(results):
         django.db.close_old_connections()
         models.User.objects.bulk_update(users,
                                         [
-                                            'screen_name', 'logo', 'name', 'followers', 'username', 'screen_name',
+                                             'logo', 'name', 'followers', 'username', 'screen_name',
                                             'last_modified'
                                         ],
                                         batch_size=batch_size)
@@ -537,6 +535,17 @@ def save_group_info(face, group, parse_url):
                                        sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
                                        name=result["name"])
         except Exception:
+            if username:
+                try:
+                    user = models.User.objects.filter(screen_name=username).first()
+                    if user:
+                        if user.id != result["id"]:
+                            user.id = result["id"]
+                            user.username = result["id"]
+                            user.save()
+                except Exception as e:
+                    print(f"save_group_info {e}")
+
             models.User.objects.bulk_update(
                 [models.User(id=result["id"], screen_name=username, username=result["id"], logo="", url=user_url,
                              sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
@@ -547,8 +556,9 @@ def save_group_info(face, group, parse_url):
                 ],
                 batch_size=batch_size)
     except Exception as e:
-        print(e)
+        print(f"save_group_info {e}")
     try:
         return result["id"]
     except Exception as e:
+        print(f"save_group_info {e}")
         return None
