@@ -254,7 +254,7 @@ def search_source(face_session, account, source, retro):
                     print(e)
         except Exception as e:
             print(f"search_source {source} {e}")
-            if "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e):
+            if "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e) or "Your request couldn't be processed" in str(e):
                 source.disabled = 1
                 source.save(update_fields=["disabled"])
             if "Content Not Found" in str(e):
