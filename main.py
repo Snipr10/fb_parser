@@ -141,7 +141,7 @@ if __name__ == '__main__':
                     except Exception as e:
                         print(e)
                     try:
-                        Sources.objects.filter(network_id=network_id, taken=1).update(taken=0)
+                        SourcesItems.objects.filter(network_id=network_id, taken=1).update(taken=0)
                     except Exception as e:
                         print(e)
                     i = 0
@@ -149,7 +149,7 @@ if __name__ == '__main__':
                 print(e)
             try:
                 select_sources = Sources.objects.filter(status=0)
-                sources_item = SourcesItems.objects.filter(network_id=3, disabled=0, taken=0,
+                sources_item = SourcesItems.objects.filter(network_id=network_id, disabled=0, taken=0,
                                                            last_modified__isnull=False,
                                                            source_id__in=list(
                                                                select_sources.values_list('id', flat=True))
