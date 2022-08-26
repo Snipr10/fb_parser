@@ -5,11 +5,11 @@ import logging
 import requests
 import pyquery
 
+from MyFacebookScraper import MyFacebookScraper
 from core import models
 from django.utils import timezone
 from fb_parser.utils.find_data import find_value, update_time_timezone
-from fb_parser.utils.proxy import get_proxy_str, proxy_last_used, get_proxy
-from facebook_scraper import FacebookScraper
+from fb_parser.utils.proxy import get_proxy_str, get_proxy
 from requests.cookies import cookiejar_from_dict
 
 logger = logging.getLogger(__file__)
@@ -27,6 +27,7 @@ def check_bot(face_session, account):
                 print(e)
     except Exception as e:
         print(f"check_bot {e}")
+
     if len(results_test) == 0:
         account.banned = 1
         account.save(update_fields=["banned"])
@@ -71,7 +72,7 @@ def get_session(is_special=False, is_join=False):
         account.last_parsing = update_time_timezone(timezone.now())
         account.save()
         proxy = models.AllProxy.objects.get(id=account.proxy_id)
-        face = FacebookScraper()
+        face = MyFacebookScraper()
         face.session.cookies.update(cookiejar_from_dict(json.loads(account.cookie)))
         # face.login("100081198725298", "howardsxfloyd271")
         face.set_proxy('http://{}:{}@{}:{}'.format(proxy.login, proxy.proxy_password, proxy.ip, proxy.port))
