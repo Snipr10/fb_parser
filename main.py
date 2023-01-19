@@ -128,7 +128,7 @@ if __name__ == '__main__':
         try:
             django.db.close_old_connections()
             try:
-                Account.objects.filter(taken=1,
+                Account.objects.filter(
                                        last_parsing__lte=update_time_timezone(
                                            timezone.now() - datetime.timedelta(minutes=60)),
                                        ).update(taken=0, banned=0)
