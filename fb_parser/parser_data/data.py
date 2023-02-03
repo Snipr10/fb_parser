@@ -256,8 +256,10 @@ def search_source(face_session, account, source, retro):
         except Exception as e:
             print(f"search_source {source} {e}")
             if "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e) or "Exceeded 30 redirects" in str(e) or "404 Client Error: Not Found for url:" in str(e):
-                source.disabled = 1
+                # source.disabled = 1
                 source.save(update_fields=["disabled"])
+                raise e
+
             elif "Content Not Found" in str(e):
                 source.taken = 0
                 source.last_modified = update_time_timezone(timezone.localtime())
@@ -285,7 +287,8 @@ def search_source(face_session, account, source, retro):
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.error = str(e)
         account.taken = 0
-        if "Temporarily Blocked" in str(e) or "banned" in str(e) or "Your Account Has Been Disabled" in str(e):
+        if "Temporarily Blocked" in str(e) or "banned" in str(e) or "Your Account Has Been Disabled" in str(e) or \
+                "Exceeded 30 redirects" in str(e) or "404 Client Error: Not Found for url:" in str(e):
             account.banned = 1
             account.save(update_fields=["error", "taken", "last_parsing", "banned"])
         else:
