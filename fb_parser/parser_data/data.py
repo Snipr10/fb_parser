@@ -233,6 +233,7 @@ def search_source(face_session, account, source, retro):
             try:
                 group_id = save_group_info(face_session, source.data, parse_url)
             except Exception as e:
+                print(f"error group_id {e}")
                 group_id = None
             for p in face_session.get_posts(parse_url, page_limit=40, max_past_limit=10):
                 try:
@@ -280,6 +281,7 @@ def search_source(face_session, account, source, retro):
         account.taken = 0
         account.save(update_fields=["last_parsing", "taken"])
     except Exception as e:
+        print(f"search_source {e}")
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.error = str(e)
         account.taken = 0
