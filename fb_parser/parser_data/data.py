@@ -549,7 +549,7 @@ def save_group_info(face, group, parse_url):
                             user.username = result["id"]
                             user.save()
                 except Exception as e:
-                    print(f"save_group_info {e}")
+                    print(f"save_group_info 1 {e}")
 
             models.User.objects.bulk_update(
                 [models.User(id=result["id"], screen_name=username, username=result["id"], logo="", url=user_url,
@@ -561,9 +561,9 @@ def save_group_info(face, group, parse_url):
                 ],
                 batch_size=batch_size)
     except Exception as e:
-        print(f"save_group_info {e}")
+        print(f"save_group_info 2 {e}")
     try:
         return result["id"]
     except Exception as e:
-        print(f"save_group_info {e}")
+        print(f"save_group_info 3 {e}")
         return None
