@@ -418,10 +418,11 @@ def saver(results):
 
         models.Post.objects.bulk_update(posts, [
             'created_date', 'likes_count', 'comments_count', 'repost_count',
-            'last_modified' 'user_id', 'group_id'
+            'last_modified', 'user_id', 'group_id'
         ], batch_size=batch_size)
     except Exception as e:
         print(f"Post bulk_update {e}")
+
     try:
         django.db.close_old_connections()
 
