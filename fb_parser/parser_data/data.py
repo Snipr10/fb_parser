@@ -347,6 +347,7 @@ def saver(results):
     django.db.close_old_connections()
     print("saver")
     for z in results:
+        print(z)
         try:
             post_id = z['post_id']
             content = z['post_text']
@@ -375,20 +376,21 @@ def saver(results):
             try:
                 username = user_url.split("/")[-1]
             except Exception as e:
+                print(f"Exception save  {e}")
+
                 username = None
             users.append(models.User(id=user_id, username=user_id, screen_name=username, logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
                                      name=z['username']))
         except Exception as e:
-            print(e)
-
+            print(f"Exception save append {e}")
 
     try:
         django.db.close_old_connections()
 
         models.User.objects.bulk_create(users, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
-        print(e)
+        print(f"user bulk create  {e}")
     try:
         django.db.close_old_connections()
         models.User.objects.bulk_update(users,
@@ -398,7 +400,7 @@ def saver(results):
                                         ],
                                         batch_size=batch_size)
     except Exception as e:
-        print(e)
+        print(f"user bulk update {e}")
     try:
         django.db.close_old_connections()
 
@@ -406,9 +408,9 @@ def saver(results):
             try:
                 u.save()
             except Exception as e:
-                print(e)
+                print(f"u save {e}")
     except Exception as e:
-        print(e)
+        print(f"u saver {e}")
     try:
         django.db.close_old_connections()
 
@@ -417,20 +419,20 @@ def saver(results):
             'last_modified' 'user_id', 'group_id'
         ], batch_size=batch_size)
     except Exception as e:
-        print(e)
+        print(f"Post bulk_update {e}")
     try:
         django.db.close_old_connections()
 
         models.Post.objects.bulk_create(posts, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
-        print(e)
+        print(f"Post bulk_create {e}")
 
     try:
         django.db.close_old_connections()
 
         models.PostContent.objects.bulk_create(post_content, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
-        print(e)
+        print(f"PostContent bulk_create {e}")
 
 
 def get_data_from_url(post, proxy):
