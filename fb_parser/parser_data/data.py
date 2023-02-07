@@ -257,13 +257,15 @@ def search_source(face_session, account, source, retro):
             print(f"search_source {source} {e}")
                 # source.disabled = 1
                 # source.save(update_fields=["disabled"])
+            django.db.close_old_connections()
             if "Content Not Found" in str(e):
                 source.taken = 0
                 source.last_modified = update_time_timezone(timezone.localtime())
                 source.save(update_fields=["last_modified", "taken"])
             elif "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e) or "Exceeded 30 redirects" in str(e) or "404 Client Error: Not Found for url:" in str(e):
-                raise e
-            raise e
+                if len(results) <1:
+                    raise e
+            # raise e
         if len(results) == 0:
             from fb_parser.bot.bot import check_bot
             check_bot(face_session, account)
