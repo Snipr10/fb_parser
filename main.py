@@ -108,7 +108,7 @@ if __name__ == '__main__':
         for a in accounts:
             proxies_set.add(a.proxy_id)
         proxies_list = list(proxies_set)
-        print(f"{proxies_list=}")
+        print(f"proxies_list {proxies_list}")
         work_proxy = []
         work_proxy_ids = []
         proxy_candidates = AllProxy.objects.filter(ip__in=[30001, 30011, 30010])
@@ -122,8 +122,8 @@ if __name__ == '__main__':
 
             except Exception:
                 pass
-        print(f"{work_proxy=}")
-        print(f"{work_proxy_ids=}")
+        print(f"work_proxy {work_proxy}")
+        print(f"work_proxy_ids {work_proxy_ids}")
 
         exist_proxy = AllProxy.objects.filter(id__in=proxies_list)
         for e_p in exist_proxy:
@@ -135,13 +135,13 @@ if __name__ == '__main__':
                     work_proxy_ids.append(e_p.id)
             except Exception:
                 pass
-        print(f"{work_proxy=}")
-        print(f"{work_proxy_ids=}")
+        print(f"work_proxy {work_proxy}")
+        print(f"work_proxy_ids {work_proxy_ids}")
         for a in accounts:
             if a.proxy_id not in work_proxy_ids:
                 a.proxy_id = random.choice(work_proxy_ids)
                 a.save(update_fields=["proxy_id"])
-                print(f"{a=}")
+                print(f"account {a}")
     except Exception as e:
         print(e)
 
