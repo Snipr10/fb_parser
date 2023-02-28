@@ -4,11 +4,13 @@ import time
 
 import threading
 
+import requests
 from django.utils import timezone
 
 import os
 
 from django.db.models import Q
+import random
 
 BOT = None
 
@@ -88,11 +90,65 @@ if __name__ == '__main__':
     #
     # x = threading.Thread(target=update_, args=(0,))
     # x.start()
-    from core.models import Account, Keyword, Sources, SourcesItems
+    from core.models import Account, Keyword, Sources, SourcesItems, AllProxy
     from fb_parser.tasks import start_parsing_by_keyword, start_parsing_by_source, start_parsing_account_source
     from fb_parser.utils.find_data import update_time_timezone
     import datetime
     from fb_parser.settings import network_id
+
+
+
+    print("start")
+    try:
+        accounts = Account.objects.filter(
+            last_parsing__lte=update_time_timezone(
+                timezone.now() - datetime.timedelta(minutes=60)),
+        )
+        proxies_set = set()
+        for a in accounts:
+            proxies_set.add(a.proxy_id)
+        proxies_list = list(proxies_set)
+        work_proxy = []
+        work_proxy_ids = []
+        proxy_candidates = AllProxy.objects.filter(ip__in=[30001, 30011, 30010])
+        for can in proxy_candidates:
+            try:
+                proxy_str = f"{can.login}:{can.proxy_password}@{can.ip}:{can.port}"
+                proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
+                if requests.get("https://www.facebook.com/", proxies=proxies).ok:
+                    work_proxy.append(can)
+                    work_proxy_ids.append(can.id)
+
+            except Exception:
+                pass
+        exist_proxy = AllProxy.objects.filter(id__in=proxies_list)
+        for e_p in exist_proxy:
+            try:
+                proxy_str = f"{e_p.login}:{e_p.proxy_password}@{e_p.ip}:{e_p.port}"
+                proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
+                if requests.get("https://www.facebook.com/", proxies=proxies).ok:
+                    work_proxy.append(e_p)
+                    work_proxy_ids.append(e_p.id)
+            except Exception:
+                pass
+        for a in accounts:
+            if a.proxy_id not in work_proxy_ids:
+                a.proxy_id = random.choice(work_proxy_ids)
+                a.save(update_fields=["proxy_id"])
+    except Exception as e:
+        print(e)
+
+
+
+
+
+
+
+
+
+
+
+
 
     # start_parsing_by_source_while(False)
     x = threading.Thread(target=new_process_account_item, args=(0, ))
@@ -156,6 +212,44 @@ if __name__ == '__main__':
                                                                select_sources.values_list('id', flat=True))
                                                            )
                 sources_item.update(disabled=1)
+            except Exception as e:
+                print(e)
+            try:
+                accounts = Account.objects.filter(
+                    last_parsing__lte=update_time_timezone(
+                        timezone.now() - datetime.timedelta(minutes=60)),
+                )
+                proxies_set = set()
+                for a in accounts:
+                    proxies_set.add(a.proxy_id)
+                proxies_list = list(proxies_set)
+                work_proxy = []
+                work_proxy_ids = []
+                proxy_candidates = AllProxy.objects.filter(ip__in=[30001, 30011, 30010])
+                for can in proxy_candidates:
+                    try:
+                        proxy_str = f"{can.login}:{can.proxy_password}@{can.ip}:{can.port}"
+                        proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
+                        if requests.get("https://www.facebook.com/", proxies=proxies).ok:
+                            work_proxy.append(can)
+                            work_proxy_ids.append(can.id)
+
+                    except Exception:
+                        pass
+                exist_proxy = AllProxy.objects.filter(id__in=proxies_list)
+                for e_p in exist_proxy:
+                    try:
+                        proxy_str = f"{e_p.login}:{e_p.proxy_password}@{e_p.ip}:{e_p.port}"
+                        proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
+                        if requests.get("https://www.facebook.com/", proxies=proxies).ok:
+                            work_proxy.append(e_p)
+                            work_proxy_ids.append(e_p.id)
+                    except Exception:
+                        pass
+                for a in accounts:
+                    if a.proxy_id not in work_proxy_ids:
+                        a.proxy_id = random.choice(work_proxy_ids)
+                        a.save(update_fields=["proxy_id"])
             except Exception as e:
                 print(e)
         except Exception as e:
