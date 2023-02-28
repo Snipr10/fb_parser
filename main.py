@@ -116,12 +116,12 @@ if __name__ == '__main__':
             try:
                 proxy_str = f"{can.login}:{can.proxy_password}@{can.ip}:{can.port}"
                 proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
-                if requests.get("https://www.facebook.com/", proxies=proxies).ok:
+                if requests.get("https://www.facebook.com/", proxies=proxies, timeout=50).ok:
                     work_proxy.append(can)
                     work_proxy_ids.append(can.id)
 
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"{proxy_str} {e}")
         print(f"work_proxy {work_proxy}")
         print(f"work_proxy_ids {work_proxy_ids}")
 
@@ -130,11 +130,11 @@ if __name__ == '__main__':
             try:
                 proxy_str = f"{e_p.login}:{e_p.proxy_password}@{e_p.ip}:{e_p.port}"
                 proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
-                if requests.get("https://www.facebook.com/", proxies=proxies).ok:
+                if requests.get("https://www.facebook.com/", proxies=proxies, timeout=50).ok:
                     work_proxy.append(e_p)
                     work_proxy_ids.append(e_p.id)
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"{proxy_str} {e}")
         print(f"work_proxy {work_proxy}")
         print(f"work_proxy_ids {work_proxy_ids}")
         for a in accounts:
