@@ -115,7 +115,7 @@ if __name__ == '__main__':
         for can in proxy_candidates:
             try:
                 proxy_str = f"{can.login}:{can.proxy_password}@{can.ip}:{can.port}"
-                proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
+                proxies = {'https': f'http://{proxy_str}'}
                 if requests.get("https://www.facebook.com/", proxies=proxies, timeout=50).ok:
                     work_proxy.append(can)
                     work_proxy_ids.append(can.id)
@@ -129,7 +129,7 @@ if __name__ == '__main__':
         for e_p in exist_proxy:
             try:
                 proxy_str = f"{e_p.login}:{e_p.proxy_password}@{e_p.ip}:{e_p.port}"
-                proxies = {'http': f'http://{proxy_str}', 'https': f'https://{proxy_str}'}
+                proxies = {'https': f'http://{proxy_str}'}
                 if requests.get("https://www.facebook.com/", proxies=proxies, timeout=50).ok:
                     work_proxy.append(e_p)
                     work_proxy_ids.append(e_p.id)
