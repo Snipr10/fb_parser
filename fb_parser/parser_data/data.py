@@ -271,6 +271,7 @@ def search_source(face_session, account, source, retro):
             check_bot(face_session, account)
         django.db.close_old_connections()
 
+        print(f"saver account {account}")
         saver(results)
         source.taken = 0
         if len(results) >= 0:
