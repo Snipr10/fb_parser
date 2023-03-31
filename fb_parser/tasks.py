@@ -37,7 +37,7 @@ def start_parsing_by_keyword(special_group=False):
     # print(f"key_source special_group {special_group}" )
     key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
     # delete id
-    print(f"key_word special_group {special_group}" )
+    print(f"key_word special_group {special_group}")
 
     keyword_id_in = list(models.SourcesSpecial.objects.all().values_list('keyword_id', flat=True))
 
@@ -49,23 +49,30 @@ def start_parsing_by_keyword(special_group=False):
             enabled=1,
             taken=0,
             reindexing=1,
+            keyword__length__lte=10,
             id__in=list(key_source.values_list('keyword_id', flat=True))
         ).order_by('last_modified').first()
         if key_word is None:
             key_word = models.Keyword.objects.filter(id__in=keyword_id_in).filter(network_id=network_id, enabled=1,
                                                                                   taken=0,
+                                                                                  keyword__length__lte=10,
+
                                                                                   id__in=list(key_source.values_list(
                                                                                       'keyword_id', flat=True))
                                                                                   ).order_by('last_modified').first()
     else:
         key_word = models.Keyword.objects.filter(~Q(id__in=keyword_id_in)).filter(network_id=network_id, enabled=1,
                                                                                   taken=0, reindexing=1,
+                                                                                  keyword__length__lte=10,
+
                                                                                   id__in=list(key_source.values_list(
                                                                                       'keyword_id', flat=True))
                                                                                   ).order_by('last_modified').first()
         if key_word is None:
             key_word = models.Keyword.objects.filter(~Q(id__in=keyword_id_in)).filter(network_id=network_id, enabled=1,
                                                                                       taken=0,
+                                                                                      keyword__length__lte=10,
+
                                                                                       id__in=list(
                                                                                           key_source.values_list(
                                                                                               'keyword_id', flat=True))

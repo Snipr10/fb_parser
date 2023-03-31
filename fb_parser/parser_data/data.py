@@ -307,14 +307,17 @@ def search(face_session, account, keyword):
         limit = 0
         results = []
         print(keyword.keyword)
-        for p in face_session.get_posts_by_search(keyword.keyword, page_limit=40, max_past_limit=10):
-            try:
-                results.append(p)
-                if limit > 250:
-                    break
-                limit += 1
-            except Exception as e:
-                print(e)
+        try:
+            for p in face_session.get_posts_by_search(keyword.keyword, page_limit=3, max_past_limit=10):
+                try:
+                    results.append(p)
+                    if limit > 250:
+                        break
+                    limit += 1
+                except Exception as e:
+                    print(e)
+        except Exception as e:
+            print(e)
         if len(results) == 0:
             from fb_parser.bot.bot import check_bot
             check_bot(face_session, account)
