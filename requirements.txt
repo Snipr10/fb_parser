@@ -21,7 +21,7 @@ PySocks==1.7.1
 python-dotenv~=0.15.0
 pytz~=2020.4
 redis==3.5.3
-redis-server==5.0.7
+redis-server==5.0.9
 requests~=2.22.0
 rsa==4.6
 six==1.15.0
