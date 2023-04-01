@@ -17,21 +17,17 @@ logger = logging.getLogger(__file__)
 
 def check_bot(face_session, account):
     print("check_bot")
-    # results_test = []
-    # try:
-    #     for post in face_session.get_posts('161499224409433'):
-    #         try:
-    #             results_test.append(post)
-    #             break
-    #         except Exception as e:
-    #             print(e)
-    # except Exception as e:
-    #     print(f"check_bot {e}")
-    #
-    # if len(results_test) == 0:
-    #     account.banned = 1
-    #     account.save(update_fields=["banned"])
-    #     raise Exception("banned")
+    ban = True
+    try:
+        if face_session.get_profile("nintendo").get("id") is not None:
+            ban = False
+    except Exception as e:
+        print(f"check_bot: {e}")
+
+    if ban:
+        account.banned = 1
+        account.save(update_fields=["banned"])
+        raise Exception("banned")
 
 
 def get_session(is_special=False, is_join=False):
