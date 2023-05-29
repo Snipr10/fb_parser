@@ -180,7 +180,7 @@ if __name__ == '__main__':
                 print(f"proxies_list {proxies_list}")
                 work_proxy = []
                 work_proxy_ids = []
-                proxy_candidates = AllProxy.objects.filter(ip__in=[30001, 30011, 30010])
+                proxy_candidates = AllProxy.objects.filter(port__in=[30001, 30011, 30010])
                 for can in proxy_candidates:
                     try:
                         proxy_str = f"{can.login}:{can.proxy_password}@{can.ip}:{can.port}"
