@@ -154,34 +154,36 @@ CELERY_RESULT_SERIALIZER = 'json'
 BATCH_SIZE = 200
 
 network_id = 3
+LOGGING_CONFIG = None
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "root": {"level": "INFO", "handlers": ["file"]},
-    "handlers": {
-        "file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "django.log",
-            "formatter": "app",
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["file"],
-            "level": "INFO",
-            "propagate": True
-        },
-    },
-    "formatters": {
-        "app": {
-            "format": (
-                u"%(asctime)s [%(levelname)-8s] "
-                "(%(module)s.%(funcName)s) %(message)s"
-            ),
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-    },
-}
+LOGGING = None
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "root": {"level": "INFO", "handlers": ["file"]},
+#     "handlers": {
+#         "file": {
+#             "level": "INFO",
+#             "class": "logging.FileHandler",
+#             "filename": "django.log",
+#             "formatter": "app",
+#         },
+#     },
+#     "loggers": {
+#         "django": {
+#             "handlers": ["file"],
+#             "level": "INFO",
+#             "propagate": True
+#         },
+#     },
+#     "formatters": {
+#         "app": {
+#             "format": (
+#                 u"%(asctime)s [%(levelname)-8s] "
+#                 "(%(module)s.%(funcName)s) %(message)s"
+#             ),
+#             "datefmt": "%Y-%m-%d %H:%M:%S",
+#         },
+#     },
+# }
 BEST_PROXY_KEY = '3f47cf0333045116c1f6ad61fa4faa68'
