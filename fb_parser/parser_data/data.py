@@ -15,7 +15,7 @@ from urllib3 import HTTPSConnectionPool
 
 from core import models
 from fb_parser.parser_data.user import get_update_user
-from fb_parser.settings import BATCH_SIZE
+from fb_parser.settings import BATCH_SIZE, FIRST_DATE
 from fb_parser.utils.find_data import find_value, update_time_timezone, get_sphinx_id, get_md5_text
 from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used, stop_proxy
 
@@ -360,6 +360,11 @@ def saver(results):
     for z in results:
         print(z)
         try:
+            print("FIRST_DATE")
+            if z['time'] < FIRST_DATE:
+                continue
+            print("z['time'] < FIRST_DATE")
+
             post_id = z['post_id']
             content = z['post_text']
             if content is None:

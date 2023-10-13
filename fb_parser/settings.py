@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -187,3 +187,5 @@ LOGGING = None
 #     },
 # }
 BEST_PROXY_KEY = '3f47cf0333045116c1f6ad61fa4faa68'
+
+FIRST_DATE = datetime.datetime(2022, 4, 2)
