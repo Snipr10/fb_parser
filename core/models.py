@@ -247,9 +247,9 @@ class Account(models.Model):
     # proxy_id = models.CharField(max_length=256)
     # start_parsing = models.DateTimeField(null=True, blank=True)
     # last_parsing = models.DateTimeField(null=True, blank=True)
-    # error = models.CharField(default='', max_length=1000)
-    # special_group = models.IntegerField(default=0)
-    # is_join_group = models.IntegerField(default=0)
+    error = models.CharField(default='', max_length=255)
+    special_group = models.IntegerField(default=0)
+    is_join_group = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'prsr_parser_fb_account'
