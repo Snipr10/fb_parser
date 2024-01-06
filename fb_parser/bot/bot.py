@@ -33,7 +33,7 @@ def check_bot(face_session, account):
 def get_session(is_special=False, is_join=False):
     print(f"get_session is_special {is_special}")
     if is_join:
-        account = models.Account.objects.filter(taken=False, banned=False,
+        account = models.Account.objects.filter(taken=0, banned=0,
                                                 is_join_group=1,
                                                 last_parsing__lte=update_time_timezone(
                                                     timezone.now() - datetime.timedelta(minutes=20)),
@@ -41,7 +41,7 @@ def get_session(is_special=False, is_join=False):
             'last_parsing').first()
 
     elif is_special:
-        account = models.Account.objects.filter(taken=False, banned=False,
+        account = models.Account.objects.filter(taken=0, banned=0,
                                                 is_join_group=0,
                                                 special_group=1,
                                                 last_parsing__lte=update_time_timezone(
@@ -50,7 +50,7 @@ def get_session(is_special=False, is_join=False):
             'last_parsing').first()
     else:
         print(1)
-        account = models.Account.objects.filter(taken=False, banned=False,
+        account = models.Account.objects.filter(taken=0, banned=0,
                                                 is_join_group=0,
                                                 special_group=0,
                                                 last_parsing__lte=update_time_timezone(
