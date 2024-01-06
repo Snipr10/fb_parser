@@ -49,6 +49,7 @@ def get_session(is_special=False, is_join=False):
                                                 proxy_id__isnull=False).order_by(
             'last_parsing').first()
     else:
+        print(1)
         account = models.Account.objects.filter(taken=False, banned=False,
                                                 is_join_group=0,
                                                 special_group=0,
@@ -56,6 +57,8 @@ def get_session(is_special=False, is_join=False):
                                                     timezone.now() - datetime.timedelta(minutes=20)),
                                                 proxy_id__isnull=False).order_by(
             'last_parsing').first()
+        print(2)
+
     print(account)
 
     if account is None:
