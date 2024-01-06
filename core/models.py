@@ -237,8 +237,8 @@ class KeywordSource(models.Model):
 
 
 class Account(models.Model):
-    # login = models.CharField(default='', max_length=200)
-    # password = models.CharField(default='', max_length=200)
+    login = models.CharField(default='', max_length=200)
+    password = models.CharField(default='', max_length=200)
     # available = models.IntegerField(default=1)
     # availability_check = models.DateTimeField(null=True, blank=True)
     # banned = models.IntegerField(default=0)
@@ -246,7 +246,7 @@ class Account(models.Model):
     # cookie = models.CharField(default='', max_length=200)
     # proxy_id = models.DecimalField(null=True, blank=True)
     # start_parsing = models.DateTimeField(null=True, blank=True)
-    last_parsing = models.DateTimeField(null=True, blank=True)
+    # last_parsing = models.DateTimeField(null=True, blank=True)
     # error = models.CharField(default='', max_length=255)
     # special_group = models.IntegerField(default=0)
     # is_join_group = models.IntegerField(default=0)
