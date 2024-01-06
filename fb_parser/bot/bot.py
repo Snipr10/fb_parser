@@ -33,12 +33,7 @@ def check_bot(face_session, account):
 def get_session(is_special=False, is_join=False):
     print(f"get_session is_special {is_special}")
     print("123")
-    models.Account.objects.filter(taken=0, banned=0,
-                                            is_join_group=0,
-                                            special_group=0,
-                                            last_parsing__lte=update_time_timezone(
-                                                timezone.now() - datetime.timedelta(minutes=20)),
-                                            proxy_id__isnull=False).order_by(
+    models.Account.objects.filter(taken=0).order_by(
         'last_parsing').first()
     print("213214214")
     if is_join:
