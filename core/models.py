@@ -244,7 +244,7 @@ class Account(models.Model):
     banned = models.IntegerField(default=0)
     taken = models.IntegerField(default=0)
     cookie = models.CharField(default='', max_length=200)
-    # proxy_id = models.IntegerField()
+    proxy_id = models.IntegerField(null=True, blank=True)
     start_parsing = models.DateTimeField(null=True, blank=True)
     last_parsing = models.DateTimeField(null=True, blank=True)
     error = models.CharField(default='', max_length=255)
