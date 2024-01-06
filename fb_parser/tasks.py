@@ -221,7 +221,7 @@ def start_first_update_posts():
 @app.task
 def add_work_credential():
     account_work_ids = models.WorkCred.objects.filter().values_list('account_id', flat=True)
-    account_work = models.Account.objects.filter(available=1, banned=0).exclude(id__in=account_work_ids)
+    account_work = models.Account.objects.filter(available=True, banned=False).exclude(id__in=account_work_ids)
     for account in account_work:
         check_accounts(account, attempt=0)
 
@@ -305,7 +305,7 @@ def update_proxy():
 
 def check_proxy_available_for_facebook(session):
     try:
-        accounts = models.Account.objects.filter(banned=0).order_by('id')[:500]
+        accounts = models.Account.objects.filter(banned=False).order_by('id')[:500]
         account = random.choice(accounts)
         # login = "+79910404158"
         # password = "yBZHsBZHou761"
