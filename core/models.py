@@ -240,7 +240,7 @@ class Account(models.Model):
     login = models.CharField(default='', max_length=200)
     password = models.CharField(default='', max_length=200)
     available = models.IntegerField(default=1)
-    availability_check = models.DateTimeField(null=True, blank=True)
+    # availability_check = models.DateTimeField(null=True, blank=True)
     banned = models.IntegerField(default=0)
     taken = models.IntegerField(default=0)
     cookie = models.CharField(default='', max_length=200)
