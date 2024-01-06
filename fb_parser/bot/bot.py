@@ -32,7 +32,9 @@ def check_bot(face_session, account):
 
 def get_session(is_special=False, is_join=False):
     print(f"get_session is_special {is_special}")
+    print("123")
     models.Account.objects.all()
+    print("213214214")
     if is_join:
         account = models.Account.objects.filter(taken=0, banned=0,
                                                 is_join_group=1,
