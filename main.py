@@ -146,6 +146,13 @@ if __name__ == '__main__':
                 cursor.execute(query)
         except Exception as e:
             print(e)
+
+        try:
+            with connection.cursor() as cursor:
+                query = """ UPDATE `prsr_parser_keywords` set depth = '0001-01-01' WHERE `network_id` = 3 AND `disabled` = 0 AND depth='0000-00-00';"""
+                cursor.execute(query)
+        except Exception as e:
+            print(e)
         try:
             django.db.close_old_connections()
             try:
