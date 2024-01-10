@@ -129,6 +129,7 @@ if __name__ == '__main__':
     while True:
 
         try:
+            print("123")
             with connection.cursor() as cursor:
                 query = """
                 UPDATE `prsr_parser_keywords` set `last_modified` = '2000-01-01 00:00:00' WHERE `network_id` = 2 AND `last_modified` = '0000-00-00 00:00:00' AND `disabled` = 0;
@@ -136,6 +137,8 @@ if __name__ == '__main__':
                 cursor.execute(query)
         except Exception as e:
             print(e)
+        print("234")
+
         i += 1
         time.sleep(180)
 
