@@ -128,20 +128,24 @@ if __name__ == '__main__':
     i = 1
     while True:
 
+        i += 1
+        time.sleep(180)
         try:
-            print("123")
             with connection.cursor() as cursor:
                 query = """
-                UPDATE `prsr_parser_keywords` set `last_modified` = '2000-01-01 00:00:00' WHERE `network_id` = 2 AND `last_modified` = '0000-00-00 00:00:00' AND `disabled` = 0;
+                UPDATE `prsr_parser_keywords` set `last_modified` = '2000-01-01 00:00:00' WHERE `network_id` = 3 AND `last_modified` = '0000-00-00 00:00:00' AND `disabled` = 0;
                 """
                 cursor.execute(query)
         except Exception as e:
             print(e)
-        print("234")
-
-        i += 1
-        time.sleep(180)
-
+        try:
+            with connection.cursor() as cursor:
+                query = """
+                UPDATE `prsr_parser_source_items` set `last_modified` = '2000-01-01 00:00:00' WHERE `network_id` = 3 AND `disabled` = 0 AND `last_modified` = '0000-00-00 00:00:00';
+                """
+                cursor.execute(query)
+        except Exception as e:
+            print(e)
         try:
             django.db.close_old_connections()
             try:
