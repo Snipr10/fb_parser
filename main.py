@@ -95,6 +95,7 @@ if __name__ == '__main__':
     from fb_parser.utils.find_data import update_time_timezone
     import datetime
     from fb_parser.settings import network_id
+    from django.db import connection
 
     # start_parsing_by_source_while(False)
     x = threading.Thread(target=new_process_account_item, args=(0, ))
@@ -126,8 +127,18 @@ if __name__ == '__main__':
 
     i = 1
     while True:
+
+        try:
+            with connection.cursor() as cursor:
+                query = """
+                UPDATE `prsr_parser_keywords` set `last_modified` = '2000-01-01 00:00:00' WHERE `network_id` = 2 AND `last_modified` = '0000-00-00 00:00:00' AND `disabled` = 0;
+                """
+                cursor.execute(query)
+        except Exception as e:
+            print(e)
         i += 1
         time.sleep(180)
+
         try:
             django.db.close_old_connections()
             try:
