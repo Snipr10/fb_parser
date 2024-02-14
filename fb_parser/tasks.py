@@ -35,7 +35,7 @@ def start_parsing_by_keyword(special_group=False):
         print(f"not select_sources special_group {special_group}")
         return
     # print(f"key_source special_group {special_group}" )
-    key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
+    key_source = models.KeywordSource.objects.filter(source_id__in=[19756])
     # delete id
     print(f"key_word special_group {special_group}" )
 
