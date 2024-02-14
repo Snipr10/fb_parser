@@ -30,7 +30,7 @@ def start_parsing_by_keyword(special_group=False):
 
     select_sources = models.Sources.objects.filter(
         Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
-        status=1)
+        status=1, id=19756)
     if not select_sources.exists():
         print(f"not select_sources special_group {special_group}")
         return
