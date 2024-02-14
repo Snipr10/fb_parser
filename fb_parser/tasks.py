@@ -30,12 +30,12 @@ def start_parsing_by_keyword(special_group=False):
 
     select_sources = models.Sources.objects.filter(
         Q(retro_max__isnull=True) | Q(retro_max__gte=timezone.now()), published=1,
-        status=1, id=19756)
+        status=1)
     if not select_sources.exists():
         print(f"not select_sources special_group {special_group}")
         return
     # print(f"key_source special_group {special_group}" )
-    key_source = models.KeywordSource.objects.filter(source_id__in=[19756])
+    key_source = models.KeywordSource.objects.filter(source_id__in=list(select_sources.values_list('id', flat=True)))
     # delete id
     print(f"key_word special_group {special_group}" )
 
