@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -92,14 +92,16 @@ DATABASES = {
         # 'USER': 'admin',
         # 'PASSWORD': 'admin',
         #  'HOST': '192.168.0.168',
-        'HOST': '192.168.5.11',
+        'HOST': '192.168.5.27',
 
         'PORT': '3306',
         #       'OPTIONS': {
         #         "init_command": "SET GLOBAL max_connections = 100000", #<-- The fix
         #      }
 
-    }
+        'OPTIONS': {
+                'connect_timeout': 15,
+        }}
 }
 
 # Password validation
@@ -152,34 +154,38 @@ CELERY_RESULT_SERIALIZER = 'json'
 BATCH_SIZE = 200
 
 network_id = 3
+LOGGING_CONFIG = None
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "root": {"level": "INFO", "handlers": ["file"]},
-    "handlers": {
-        "file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "django.log",
-            "formatter": "app",
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["file"],
-            "level": "INFO",
-            "propagate": True
-        },
-    },
-    "formatters": {
-        "app": {
-            "format": (
-                u"%(asctime)s [%(levelname)-8s] "
-                "(%(module)s.%(funcName)s) %(message)s"
-            ),
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-    },
-}
+LOGGING = None
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "root": {"level": "INFO", "handlers": ["file"]},
+#     "handlers": {
+#         "file": {
+#             "level": "INFO",
+#             "class": "logging.FileHandler",
+#             "filename": "django.log",
+#             "formatter": "app",
+#         },
+#     },
+#     "loggers": {
+#         "django": {
+#             "handlers": ["file"],
+#             "level": "INFO",
+#             "propagate": True
+#         },
+#     },
+#     "formatters": {
+#         "app": {
+#             "format": (
+#                 u"%(asctime)s [%(levelname)-8s] "
+#                 "(%(module)s.%(funcName)s) %(message)s"
+#             ),
+#             "datefmt": "%Y-%m-%d %H:%M:%S",
+#         },
+#     },
+# }
 BEST_PROXY_KEY = '3f47cf0333045116c1f6ad61fa4faa68'
+
+FIRST_DATE = datetime.datetime(2022, 4, 2)

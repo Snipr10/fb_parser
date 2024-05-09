@@ -16,7 +16,7 @@ from core.models import WorkCred
 from fb_parser.bot.bot import get_session, check_accounts
 from fb_parser.celery.celery import app
 from fb_parser.parser_data.data import search, parallel_parse_post, search_source
-from fb_parser.settings import network_id, BEST_PROXY_KEY
+from fb_parser.settings import network_id, BEST_PROXY_KEY, FIRST_DATE
 from fb_parser.utils.find_data import update_time_timezone
 from fb_parser.utils.proxy import generate_proxy_session, check_facebook_url
 
@@ -54,18 +54,21 @@ def start_parsing_by_keyword(special_group=False):
         if key_word is None:
             key_word = models.Keyword.objects.filter(id__in=keyword_id_in).filter(network_id=network_id, enabled=1,
                                                                                   taken=0,
+
                                                                                   id__in=list(key_source.values_list(
                                                                                       'keyword_id', flat=True))
                                                                                   ).order_by('last_modified').first()
     else:
         key_word = models.Keyword.objects.filter(~Q(id__in=keyword_id_in)).filter(network_id=network_id, enabled=1,
                                                                                   taken=0, reindexing=1,
+
                                                                                   id__in=list(key_source.values_list(
                                                                                       'keyword_id', flat=True))
                                                                                   ).order_by('last_modified').first()
         if key_word is None:
             key_word = models.Keyword.objects.filter(~Q(id__in=keyword_id_in)).filter(network_id=network_id, enabled=1,
                                                                                       taken=0,
+
                                                                                       id__in=list(
                                                                                           key_source.values_list(
                                                                                               'keyword_id', flat=True))
@@ -159,6 +162,8 @@ def start_parsing_by_source(special_group=False):
         retro = select_source.retro
 
         retro_date = datetime.datetime(retro.year, retro.month, retro.day)
+        if retro_date < FIRST_DATE:
+            retro_date = FIRST_DATE
         last_modified = sources_item.last_modified
         # try:
         #     last_modified_up = datetime.datetime(last_modified.year, last_modified.month, last_modified.day,

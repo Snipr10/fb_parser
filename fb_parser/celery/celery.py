@@ -21,12 +21,12 @@ app.conf.beat_schedule = {
     #     'schedule': crontab(minute='*/37')
     #
     # },
-    'start_parsing_by_keyword': {
-        'task': 'fb_parser.tasks.start_parsing_by_keyword',
-        'schedule': crontab(minute='*/5')
-        # 'schedule': crontab(minute='*/47')
-
-    },
+    # 'start_parsing_by_keyword': {
+    #     'task': 'fb_parser.tasks.start_parsing_by_keyword',
+    #     'schedule': crontab(minute='*/5')
+    #     # 'schedule': crontab(minute='*/47')
+    #
+    # },
     'start_parsing_by_source': {
         'task': 'fb_parser.tasks.start_parsing_by_source',
         'schedule': crontab(minute='*/5')

@@ -15,7 +15,7 @@ from urllib3 import HTTPSConnectionPool
 
 from core import models
 from fb_parser.parser_data.user import get_update_user
-from fb_parser.settings import BATCH_SIZE
+from fb_parser.settings import BATCH_SIZE, FIRST_DATE
 from fb_parser.utils.find_data import find_value, update_time_timezone, get_sphinx_id, get_md5_text
 from fb_parser.utils.proxy import get_proxy_str, get_proxy, proxy_last_used, stop_proxy
 
@@ -233,6 +233,7 @@ def search_source(face_session, account, source, retro):
             try:
                 group_id = save_group_info(face_session, source.data, parse_url)
             except Exception as e:
+                print(f"error group_id {e}")
                 group_id = None
             for p in face_session.get_posts(parse_url, page_limit=40, max_past_limit=10):
                 try:
@@ -254,19 +255,23 @@ def search_source(face_session, account, source, retro):
                     print(e)
         except Exception as e:
             print(f"search_source {source} {e}")
-            if "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e):
-                source.disabled = 1
-                source.save(update_fields=["disabled"])
+                # source.disabled = 1
+                # source.save(update_fields=["disabled"])
+            django.db.close_old_connections()
             if "Content Not Found" in str(e):
                 source.taken = 0
                 source.last_modified = update_time_timezone(timezone.localtime())
                 source.save(update_fields=["last_modified", "taken"])
-            raise e
+            elif "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e) or "Exceeded 30 redirects" in str(e) or "404 Client Error: Not Found for url:" in str(e):
+                if len(results) <1:
+                    raise e
+            # raise e
         if len(results) == 0:
             from fb_parser.bot.bot import check_bot
             check_bot(face_session, account)
         django.db.close_old_connections()
 
+        print(f"saver account {account}")
         saver(results)
         source.taken = 0
         if len(results) >= 0:
@@ -280,11 +285,14 @@ def search_source(face_session, account, source, retro):
         account.taken = 0
         account.save(update_fields=["last_parsing", "taken"])
     except Exception as e:
+        print(f"search_source {e}")
         account.last_parsing = update_time_timezone(timezone.localtime())
         account.error = str(e)
         account.taken = 0
-        if "Temporarily Blocked" in str(e) or "banned" in str(e) or "Your Account Has Been Disabled" in str(e):
+        if "Temporarily Blocked" in str(e) or "banned" in str(e) or "Your Account Has Been Disabled" in str(e) or \
+                "Exceeded 30 redirects" in str(e) or "404 Client Error: Not Found for url:" in str(e):
             account.banned = 1
+            account.error = str(e)
             account.save(update_fields=["error", "taken", "last_parsing", "banned"])
         else:
             account.save(update_fields=["error", "taken", "last_parsing"])
@@ -299,14 +307,22 @@ def search(face_session, account, keyword):
         limit = 0
         results = []
         print(keyword.keyword)
-        for p in face_session.get_posts_by_search(keyword.keyword, page_limit=40, max_past_limit=10):
-            try:
-                results.append(p)
-                if limit > 250:
-                    break
-                limit += 1
-            except Exception as e:
-                print(e)
+        search_key = keyword.keyword
+        if len(search_key) > 10:
+            white_space = search_key.find(" ", 10)
+            if white_space > 10:
+                search_key = search_key[:white_space]
+        try:
+            for p in face_session.get_posts_by_search(search_key, page_limit=3, max_past_limit=10):
+                try:
+                    results.append(p)
+                    if limit > 250:
+                        break
+                    limit += 1
+                except Exception as e:
+                    print(e)
+        except Exception as e:
+            print(e)
         if len(results) == 0:
             from fb_parser.bot.bot import check_bot
             check_bot(face_session, account)
@@ -342,7 +358,13 @@ def saver(results):
     django.db.close_old_connections()
     print("saver")
     for z in results:
+        print(z)
         try:
+            print("FIRST_DATE")
+            if z['time'] < FIRST_DATE:
+                continue
+            print("z['time'] < FIRST_DATE")
+
             post_id = z['post_id']
             content = z['post_text']
             if content is None:
@@ -370,20 +392,21 @@ def saver(results):
             try:
                 username = user_url.split("/")[-1]
             except Exception as e:
+                print(f"Exception save  {e}")
+
                 username = None
             users.append(models.User(id=user_id, username=user_id, screen_name=username, logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
                                      name=z['username']))
         except Exception as e:
-            print(e)
-
+            print(f"Exception save append {e}")
 
     try:
         django.db.close_old_connections()
 
         models.User.objects.bulk_create(users, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
-        print(e)
+        print(f"user bulk create  {e}")
     try:
         django.db.close_old_connections()
         models.User.objects.bulk_update(users,
@@ -393,7 +416,7 @@ def saver(results):
                                         ],
                                         batch_size=batch_size)
     except Exception as e:
-        print(e)
+        print(f"user bulk update {e}")
     try:
         django.db.close_old_connections()
 
@@ -401,31 +424,32 @@ def saver(results):
             try:
                 u.save()
             except Exception as e:
-                print(e)
+                print(f"u save {e}")
     except Exception as e:
-        print(e)
+        print(f"u saver {e}")
     try:
         django.db.close_old_connections()
 
         models.Post.objects.bulk_update(posts, [
             'created_date', 'likes_count', 'comments_count', 'repost_count',
-            'last_modified' 'user_id', 'group_id'
+            'last_modified', 'user_id', 'group_id'
         ], batch_size=batch_size)
     except Exception as e:
-        print(e)
+        print(f"Post bulk_update {e}")
+
     try:
         django.db.close_old_connections()
 
         models.Post.objects.bulk_create(posts, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
-        print(e)
+        print(f"Post bulk_create {e}")
 
     try:
         django.db.close_old_connections()
 
         models.PostContent.objects.bulk_create(post_content, batch_size=batch_size, ignore_conflicts=True)
     except Exception as e:
-        print(e)
+        print(f"PostContent bulk_create {e}")
 
 
 def get_data_from_url(post, proxy):
@@ -544,7 +568,7 @@ def save_group_info(face, group, parse_url):
                             user.username = result["id"]
                             user.save()
                 except Exception as e:
-                    print(f"save_group_info {e}")
+                    print(f"save_group_info 1 {e}")
 
             models.User.objects.bulk_update(
                 [models.User(id=result["id"], screen_name=username, username=result["id"], logo="", url=user_url,
@@ -556,9 +580,9 @@ def save_group_info(face, group, parse_url):
                 ],
                 batch_size=batch_size)
     except Exception as e:
-        print(f"save_group_info {e}")
+        print(f"save_group_info 2 {e}")
     try:
         return result["id"]
     except Exception as e:
-        print(f"save_group_info {e}")
+        print(f"save_group_info 3 {e}")
         return None

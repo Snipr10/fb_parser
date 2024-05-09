@@ -1,6 +1,15 @@
-version: '3.4'
+version: '3.7'
 
 services:
   main:
     build: ./
     command: python3 main.py
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1Gb
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
