@@ -6,8 +6,10 @@ ENV PYTHONUNBUFFERED 1
 
 # install dependencies
 RUN pip install --upgrade pip
-COPY ./requirements.txt .
+COPY . .
 RUN pip install -r requirements.txt
+RUN pip install -r fb_parser_get/requirements.txt
+
 # copy project
 
 COPY .  .
