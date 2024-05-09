@@ -365,27 +365,44 @@ def saver(results):
             if z['time'] < FIRST_DATE:
                 continue
             print("z['time'] < FIRST_DATE")
+            post_url = z['post_url']
 
             post_id = z['post_id']
             content = z['post_text']
             if content is None:
                 content = z['text']
             user_id = z['user_id']
-            post_url = z['post_url']
-            group_id = z['page_id'] if z['page_id'] else user_id
-
-            user_url = z['user_url'].split("?")[0]
-            if user_url[-1] == "/":
-                user_url = user_url[:-1]
-            try:
-                username = user_url.split("/")[-1]
-            except Exception as e:
-                print(f"Exception save  {e}")
-
-                username = None
+            user_url = z['user_url']
+            if user_url:
+                if "profile.php" not in user_url:
+                    user_url = z['user_url'].split("?")[0]
+                    if user_url[-1] == "/":
+                        user_url = user_url[:-1]
+                else:
+                    user_url = z['user_url'].split("&")[0]
+                    if user_url[-1] == "/":
+                        user_url = user_url[:-1]
             if not user_id:
-                user_id = get_sphinx_id(username)
+                if post_url:
+                    if "?id=" in post_url or "&id=" in post_url:
+                        if post_url.find("?id=") > 0:
+                            start = post_url.find("?id=")
+                        elif post_url.find("&id=") > 0:
+                            start = post_url.find("&id=")
 
+                        user_id = post_url[start+4:].split("&")[0]
+            if not user_id:
+
+                if user_url:
+                    if "?id=" in user_url or "&id=" in user_url:
+                        if user_url.find("?id=") > 0:
+                            start = user_url.find("?id=")
+                        elif user_url.find("&id=") > 0:
+                            start = user_url.find("&id=")
+
+                        user_id = user_url[start + 4:].split("&")[0]
+
+            group_id = z['page_id'] if z['page_id'] else user_id
             post_content.append(models.PostContent(post_id=post_id, content=content))
             posts.append(
                 models.Post(id=post_id,
@@ -401,7 +418,13 @@ def saver(results):
                             )
             )
 
-            users.append(models.User(id=user_id, username=user_id, screen_name=username, logo="", url=user_url,
+            try:
+                username = user_url.split("/")[-1]
+            except Exception as e:
+                print(f"Exception save  {e}")
+
+                username = None
+            users.append(models.User(id=user_id, username=username, screen_name=username, logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
                                      name=z['username']))
         except Exception as e:
