@@ -255,15 +255,16 @@ def search_source(face_session, account, source, retro):
                     print(e)
         except Exception as e:
             print(f"search_source {source} {e}")
-                # source.disabled = 1
-                # source.save(update_fields=["disabled"])
+            # source.disabled = 1
+            # source.save(update_fields=["disabled"])
             django.db.close_old_connections()
             if "Content Not Found" in str(e):
                 source.taken = 0
                 source.last_modified = update_time_timezone(timezone.localtime())
                 source.save(update_fields=["last_modified", "taken"])
-            elif "404 Client Error: Not Found for url: https://m.facebook.com/" in str(e) or "Exceeded 30 redirects" in str(e) or "404 Client Error: Not Found for url:" in str(e):
-                if len(results) <1:
+            elif "404 Client Error: Not Found for url: https://m.facebook.com/" in str(
+                    e) or "Exceeded 30 redirects" in str(e) or "404 Client Error: Not Found for url:" in str(e):
+                if len(results) < 1:
                     raise e
             # raise e
         if len(results) == 0:
@@ -372,6 +373,19 @@ def saver(results):
             user_id = z['user_id']
             post_url = z['post_url']
             group_id = z['page_id'] if z['page_id'] else user_id
+
+            user_url = z['user_url'].split("?")[0]
+            if user_url[-1] == "/":
+                user_url = user_url[:-1]
+            try:
+                username = user_url.split("/")[-1]
+            except Exception as e:
+                print(f"Exception save  {e}")
+
+                username = None
+            if not user_id:
+                user_id = get_sphinx_id(username)
+
             post_content.append(models.PostContent(post_id=post_id, content=content))
             posts.append(
                 models.Post(id=post_id,
@@ -386,15 +400,7 @@ def saver(results):
                             content_hash=get_md5_text(content)
                             )
             )
-            user_url = z['user_url'].split("?")[0]
-            if user_url[-1] == "/":
-                user_url = user_url[:-1]
-            try:
-                username = user_url.split("/")[-1]
-            except Exception as e:
-                print(f"Exception save  {e}")
 
-                username = None
             users.append(models.User(id=user_id, username=user_id, screen_name=username, logo="", url=user_url,
                                      sphinx_id=get_sphinx_id(user_url), last_modified=datetime.datetime.now(),
                                      name=z['username']))
@@ -411,7 +417,7 @@ def saver(results):
         django.db.close_old_connections()
         models.User.objects.bulk_update(users,
                                         [
-                                             'logo', 'name', 'followers', 'username', 'screen_name',
+                                            'logo', 'name', 'followers', 'username', 'screen_name',
                                             'last_modified'
                                         ],
                                         batch_size=batch_size)
