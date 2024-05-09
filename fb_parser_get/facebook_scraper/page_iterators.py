@@ -162,6 +162,8 @@ class PageParser:
         if (len(page) == 0):
             # TODO remove the backward compatible article selector
             page = self._get_page('article[data-ft], div[role="article"][data-ft]', 'article')
+            if (len(page) == 0):
+                page = self._get_page('div[role="article"]', 'article')
         return PageClass(page, self.get_page_info())
 
     def get_page_info(self):
