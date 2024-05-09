@@ -73,6 +73,9 @@ def get_session(is_special=False, is_join=False):
         account.save()
         proxy = models.AllProxy.objects.get(id=account.proxy_id)
         face = MyFacebookScraper()
+        face.set_user_agent(
+            'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.113 Mobile Safari/537.36')
+
         face.session.cookies.update(cookiejar_from_dict(json.loads(account.cookie)))
         # face.login("100081198725298", "howardsxfloyd271")
         face.set_proxy('http://{}:{}@{}:{}'.format(proxy.login, proxy.proxy_password, proxy.ip, proxy.port))
