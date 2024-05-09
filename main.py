@@ -105,6 +105,7 @@ if __name__ == '__main__':
             start_parsing_by_source(False)
         except Exception as e:
             print(e)
+            time.sleep(10)
     # for i in range(1):
     #     time.sleep(10)
     #     print("thread new_process_source " + str(i))
