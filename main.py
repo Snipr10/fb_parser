@@ -102,7 +102,7 @@ if __name__ == '__main__':
     x.start()
     while True:
         try:
-            start_parsing_by_source(False)
+            start_parsing_by_keyword(False)
         except Exception as e:
             print(e)
             time.sleep(10)
