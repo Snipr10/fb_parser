@@ -18,7 +18,7 @@ Task = []
 
 
 def new_process_key(i, special_group=False):
-    for i in range(2):
+    for i in range(1):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
@@ -36,7 +36,7 @@ def start_parsing_by_keyword_while(special_group=False):
 
 
 def new_process_source(i, special_group=False):
-    for i in range(2):
+    for i in range(1):
         time.sleep(random.randint(3, 9))
 
         print(f"multiprocessing {i}")
@@ -107,13 +107,13 @@ if __name__ == '__main__':
         x = threading.Thread(target=new_process_source, args=(i, True,))
         x.start()
 
-    for i in range(5):
+    for i in range(1):
         time.sleep(10)
         print("thread new_process_source " + str(i))
         x = threading.Thread(target=new_process_source, args=(i, False,))
         x.start()
 
-    for i in range(2):
+    for i in range(1):
         time.sleep(10)
         print("thread new_process_key " + str(i))
         x = threading.Thread(target=new_process_key, args=(i, False,))
