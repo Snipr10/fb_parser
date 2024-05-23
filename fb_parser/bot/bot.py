@@ -71,13 +71,14 @@ def get_session(is_special=False, is_join=False):
         face = MyFacebookScraper()
         face.set_user_agent(
             'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.113 Mobile Safari/537.36')
-
-        face.session.cookies.update(cookiejar_from_dict(json.loads(account.cookie)))
+        face.session.cookies.update(
+            json.loads(account.cookie)
+        )
         # face.login("100081198725298", "howardsxfloyd271")
         face.set_proxy('http://{}:{}@{}:{}'.format(proxy.login, proxy.proxy_password, proxy.ip, proxy.port))
 
         # face.set_proxy('http://{}:{}@{}:{}'.format("franz_allan+dev_mati", "13d9bb5825", "85.31.49.213", "30001"))
-        print(f"face, account, {account}")
+        print(f"face, account, {account} {proxy.ip}")
 
         return face, account
     except Exception as e:
