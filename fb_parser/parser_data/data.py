@@ -226,33 +226,38 @@ def search_source(face_session, account, source, retro):
         retro_post = 0
         try:
             parse_url = source.data
+            skip = True
             if source.type == 6 or source.type == "6" or source.type == 7 or source.type == "7":
                 parse_url = "groups/" + parse_url
+                skip = False
             print(f"parse_url {parse_url}")
             # for p in face_session.get_posts(parse_url):
-            try:
-                group_id = save_group_info(face_session, source.data, parse_url)
-            except Exception as e:
-                print(f"error group_id {e}")
-                group_id = None
-            for p in face_session.get_posts(parse_url, page_limit=40, max_past_limit=10):
-                try:
-                    if p['time'] < retro:
-                        retro_post += 1
-                        print("not new")
-                    else:
-                        print("new")
-                    print(p['time'])
-                    if p['post_url'] is None:
-                        p['post_url'] = face_session.base_url + "/" + parse_url + "/permalink/" + p['post_id']
-                    if group_id:
-                        p['page_id'] = group_id
-                    results.append(p)
-                    if limit > 250 or retro_post > 10:
-                        break
-                    limit += 1
-                except Exception as e:
-                    print(e)
+            group_id = None
+            #
+            # try:
+            #     group_id = save_group_info(face_session, source.data, parse_url)
+            # except Exception as e:
+            #     print(f"error group_id {e}")
+            #     group_id = None
+            if not skip:
+                for p in face_session.get_posts(parse_url, page_limit=40, max_past_limit=10):
+                    try:
+                        if p['time'] < retro:
+                            retro_post += 1
+                            print("not new")
+                        else:
+                            print("new")
+                        print(p['time'])
+                        if p['post_url'] is None:
+                            p['post_url'] = face_session.base_url + "/" + parse_url + "/permalink/" + p['post_id']
+                        if group_id:
+                            p['page_id'] = group_id
+                        results.append(p)
+                        if limit > 250 or retro_post > 10:
+                            break
+                        limit += 1
+                    except Exception as e:
+                        print(e)
         except Exception as e:
             print(f"search_source {source} {e}")
             # source.disabled = 1
@@ -275,11 +280,13 @@ def search_source(face_session, account, source, retro):
         print(f"saver account {account}")
         saver(results)
         source.taken = 0
-        if len(results) >= 0:
-            source.reindexing = 0
-            source.last_modified = update_time_timezone(timezone.localtime())
-        else:
-            account.error = "Can not get result"
+        source.reindexing = 0
+        source.last_modified = update_time_timezone(timezone.localtime())
+        # if len(results) >= 0:
+        #     source.reindexing = 0
+        #     source.last_modified = update_time_timezone(timezone.localtime())
+        # else:
+        #     account.error = "Can not get result"
 
         source.save(update_fields=["last_modified", "taken", "reindexing"])
         account.last_parsing = update_time_timezone(timezone.localtime())
