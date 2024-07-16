@@ -321,7 +321,7 @@ def search(face_session, account, keyword):
             if white_space > 10:
                 search_key = search_key[:white_space]
         try:
-            for p in face_session.get_posts_by_search(search_key, page_limit=3, max_past_limit=10):
+            for p in face_session.get_posts_by_search(search_key, page_limit=15, max_past_limit=100):
                 try:
                     results.append(p)
                     if limit > 250:
